@@ -1,0 +1,46 @@
+/*
+ * main.css — Estilos globales de la plataforma.
+ *
+ * Tailwind CSS se carga via CDN en index.html.
+ * Aquí van únicamente estilos que Tailwind no cubre o
+ * clases utilitarias propias del proyecto.
+ */
+
+/* ── Variables de color del proyecto ─────────────────────────── */
+:root {
+  --color-primary: #2563eb;      /* azul institucional */
+  --color-primary-dark: #1d4ed8;
+  --color-secondary: #0f172a;    /* fondo oscuro nav */
+  --color-accent: #f59e0b;       /* naranja para badges */
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+}
+
+/* ── Transiciones suaves en links y botones ───────────────────── */
+a,
+button {
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+/* ── Flash messages (notificaciones) ──────────────────────────── */
+.flash {
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.flash-success { background-color: #dcfce7; color: #166534; }
+.flash-error   { background-color: #fee2e2; color: #991b1b; }
+.flash-warning { background-color: #fef9c3; color: #854d0e; }
+.flash-info    { background-color: #dbeafe; color: #1e40af; }
+
+/* ── Badge de tipo de vacante ─────────────────────────────────── */
+.badge-empleo   { background-color: #dbeafe; color: #1e40af; }
+.badge-practica { background-color: #fef3c7; color: #92400e; }
+
+/* ── Estado de postulación ────────────────────────────────────── */
+.estado-pendiente  { color: #6b7280; }
+.estado-revisado   { color: #2563eb; }
+.estado-aceptado   { color: #16a34a; }
+.estado-rechazado  { color: #dc2626; }

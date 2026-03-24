@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bolsa de Trabajo y Prácticas</title>
+
+    <!-- Tailwind CSS via CDN (sin compilación, ideal para arrancar rápido) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js via CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body class="bg-gray-50 text-gray-900 min-h-screen">
+
+    <!--
+      Shell de la SPA.
+      El componente App.js inyecta el HTML dinámicamente en #app.
+      Alpine.js maneja reactividad ligera (modales, menús, formularios).
+    -->
+    <div id="app">
+      <!-- Cargando... -->
+      <div class="flex items-center justify-center min-h-screen">
+        <p class="text-gray-400 text-sm">Cargando plataforma...</p>
+      </div>
+    </div>
+
+    <!-- Punto de entrada JavaScript -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

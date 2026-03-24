@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+
+# Entorno
+.env
+*.env
+
+# Base de datos
+*.db
+*.sqlite3
+
+# Migraciones (solo el directorio versions se versiona)
+# migrations/versions/ sí se versiona
+
+# Node
+node_modules/
+dist/
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp

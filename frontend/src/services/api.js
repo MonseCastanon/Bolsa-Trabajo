@@ -81,6 +81,9 @@ export const empresas = {
 
   editarPerfil: (payload) =>
     request("/empresas/mi-perfil", { method: "PUT", body: JSON.stringify(payload) }),
+
+  miPerfil: () =>
+    request("/empresas/mi-perfil"),
 };
 
 // ── Postulaciones ─────────────────────────────────────────────────────────────
@@ -132,4 +135,7 @@ export const admin = {
 
   listarPostulaciones: () =>
     request("/admin/postulaciones"),
+
+  togglePostulacion: (id) =>
+    request(`/admin/postulaciones/${id}/toggle`, { method: "PUT" }),
 };

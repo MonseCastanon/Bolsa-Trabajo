@@ -21,7 +21,7 @@ from app import db
 
 admin_bp = Blueprint("admin", __name__)
 
-@admin_bp.route("/", method=["GET"])
+@admin_bp.route("/", methods=["GET"])
 @roles_required("admin")
 def admin():
     """Retornar contadores globales de usuarios, vacantes y postulaciones"""
@@ -69,7 +69,7 @@ def toggle_usuario(usuario_id):
 
 # TODO (Juan Diego, semana 3):
 #   - GET  /vacantes
-@admin_bp.route("/vacantes", methos=["GET"])
+@admin_bp.route("/vacantes", methods=["GET"])
 @roles_required("admin")
 def listar_vacantes():
     """Listas todas las vacantes"""
@@ -81,25 +81,26 @@ def listar_vacantes():
                 "id": v.id,
                 "titulo": v.titulo,
                 "empresa_id": v.empresa_id,
-                "activo": v.activo,
-                "creado_en": v.creado_en.isoformat(),
+                "activo": v.estado == "activa",
+                "creado_en": v.publicada_en.isoformat(),
             }
             for v in vacantes
         ],
     })
+
 #   - PUT  /vacantes/<id>/toggle
-@admin_bp.route("/vacantes/<int:vacantes_id>/toggle", method=["PUT"])
+@admin_bp.route("/vacantes/<int:vacantes_id>/toggle", methods=["PUT"])
 @roles_required("admin")
 def toggle_vacantes(vacantes_id):
     """Activa o desactiva una vacante """ 
     v = Vacante.query.get_or_404(vacantes_id)
-    v.activo = not v.activo
+    v.estado = "cerrada" if v.estado == "activa" else "activa"
     db.session.commit()
-    estado = "activada" if v.activo else "desactivada"
+    estado = "activada" if v.estado == "activa" else "desactivada"
     return jsonify({"ok": True, "mensaje": f"Vacante {estado}."})
 
 #   - GET  /postulaciones
-@admin_bp.route("/postulaciones", method=["GET"])
+@admin_bp.route("/postulaciones", methods=["GET"])
 @roles_required("admin")
 def listar_postulaciones():
     """Listas todas las postulaciones"""
@@ -110,10 +111,20 @@ def listar_postulaciones():
             {
                 "id": p.id,
                 "vacante_id": p.vacante_id,
-                "postulante_id": p.postulante_id,
+                "postulante_id": p.estudiante_id,
                 "estado": p.estado,
-                "fecha_postulacion": p.fecha_postulacion.isoformat(),
+                "fecha_postulacion": p.postulado_en.isoformat(),
             }
             for p in postulaciones
         ],
     })
+
+#   - PUT  /postulaciones/<id>/toggle
+@admin_bp.route("/postulaciones/<int:postulacion_id>/toggle", methods=["PUT"])
+@roles_required("admin")
+def toggle_postulaciones(postulacion_id):
+    """Activa o desactiva una postulacion """ 
+    p = Postulacion.query.get_or_404(postulacion_id)
+    p.estado = "revisado" if p.estado == "pendiente" else "pendiente"
+    db.session.commit()
+    return jsonify({"ok": True, "mensaje": f"Postulacion {p.estado}."})

@@ -59,7 +59,10 @@ const ROUTES = {
   // Gilberto agrega sus rutas aquí en semana 2:
   // "#/vacantes/nueva": renderNuevaVacante,
   // Juan Diego agrega las suyas:
-  // "#/admin":       renderAdmin,
+  "#/admin/panel": renderAdminPanel,
+  "#/admin/usuarios": renderAdminUsuarios,
+  "#/admin/vacantes": renderAdminVacantes,
+  "#/admin/postulaciones": renderAdminPostulaciones,
 };
 
 // ── Router ──────────────────────────────────────────────────────────────────
@@ -97,6 +100,20 @@ async function renderPage() {
       window.location.hash = el.dataset.route;
     });
   });
+
+  // Evento de cierre de sesión
+  const btnLogout = document.getElementById("btn-logout");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", async () => {
+      try {
+        await auth.logout();
+      } catch (e) {
+        console.error(e);
+      }
+      estado.setUsuario(null);
+      window.location.hash = "#/";
+    });
+  }
 }
 
 // ── Inicialización ──────────────────────────────────────────────────────────

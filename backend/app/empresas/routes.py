@@ -12,6 +12,7 @@ Endpoints planificados:
 
 from flask import Blueprint, jsonify
 from app.models import Empresa
+from app.utils import roles_required
 
 empresas_bp = Blueprint("empresas", __name__)
 

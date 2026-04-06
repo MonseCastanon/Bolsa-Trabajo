@@ -18,13 +18,21 @@ venv/
 *.db
 *.sqlite3
 
-# Migraciones (solo el directorio versions se versiona)
-# migrations/versions/ sí se versiona
+# Migraciones
+backend/migrations/
+
+# Env examples (contienen datos sensibles locales)
+.env.example
+**/.env.example
+
+# Dependencias raíz (no deben subirse)
+requirements.txt
 
 # Node
 node_modules/
 dist/
 .DS_Store
+frontend/package-lock.json
 
 # IDE
 .vscode/

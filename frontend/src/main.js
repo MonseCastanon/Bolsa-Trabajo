@@ -1,26 +1,27 @@
 /**
- * src/main.js — Punto de entrada del frontend.
+ * src/main.js — Punto de entrada del frontend (SPA con hash router).
  *
- * Responsabilidades de Monserrat (semana 1):
- *   1. Router SPA mínimo basado en hash (#/ruta)
- *   2. Inyectar el componente correcto en #app
- *   3. Verificar si el usuario está autenticado al cargar
+ * Responsabilidades:
+ *   1. Estado global de sesión
+ *   2. Router basado en hash (#/ruta)
+ *   3. Protección de rutas privadas (requireAuth)
+ *   4. Render del navbar + página activa
  *
- * En semanas 2-3 Gilberto y Juan Diego solo importan y registran
- * sus páginas en el objeto ROUTES de abajo — no tocan el router.
+ * Para agregar rutas: añadir entrada en ROUTES y, si es privada, en PRIVATE_ROUTES.
  */
 
-import { renderNavbar } from "./components/Navbar.js";
-import { renderHome } from "./pages/Home.js";
-import { renderLogin } from "./pages/Login.js";
-import { renderRegister } from "./pages/Register.js";
-import { renderVacantes } from "./pages/Vacantes.js";
+import { renderNavbar, attachNavbarListeners } from "./components/Navbar.js";
+import { PerfilPage }        from "./pages/Perfil.js";
+import { renderHome }        from "./pages/Home.js";
+import { renderLogin }       from "./pages/Login.js";
+import { renderRegister }    from "./pages/Register.js";
+import { renderVacantes }    from "./pages/Vacantes.js";
 import { renderVacanteDetalle } from "./pages/VacanteDetalle.js";
-import { renderDashboard } from "./pages/Dashboard.js";
-import { auth } from "./services/api.js";
+import { renderDashboard }   from "./pages/Dashboard.js";
+import { auth }              from "./services/api.js";
 
-// ── Estado global mínimo ────────────────────────────────────────────────────
-// Se guarda en sessionStorage para sobrevivir recargas en la misma sesión.
+// ── Estado global ─────────────────────────────────────────────────────────────
+// sessionStorage sobrevive recarga pero no cierre de pestaña.
 
 export const estado = {
   usuario: JSON.parse(sessionStorage.getItem("usuario") || "null"),
@@ -39,27 +40,54 @@ export const estado = {
   },
 };
 
-// ── Mapa de rutas ───────────────────────────────────────────────────────────
-// Formato: "#/ruta" → función que devuelve HTML string o nodo DOM.
-// Para añadir una ruta nueva, solo agregar una entrada aquí.
+// ── Rutas ─────────────────────────────────────────────────────────────────────
 
 const ROUTES = {
-  "#/":              renderHome,
-  "#/login":         renderLogin,
-  "#/registro":      renderRegister,
-  "#/vacantes":      renderVacantes,
-  "#/dashboard":     renderDashboard,
-  // Gilberto agrega sus rutas aquí en semana 2:
-  // "#/vacantes/nueva": renderNuevaVacante,
-  // Juan Diego agrega las suyas:
-  // "#/admin":       renderAdmin,
+  "#/":          renderHome,
+  "#/login":     renderLogin,
+  "#/registro":  renderRegister,
+  "#/vacantes":  renderVacantes,
+  "#/dashboard": renderDashboard,
+  "#/perfil":    PerfilPage,
+  // Gilberto agrega sus rutas aquí en semana 2
+  // Juan Diego agrega las suyas en semana 3
 };
 
-// ── Router ──────────────────────────────────────────────────────────────────
+// Rutas que requieren sesión activa
+const PRIVATE_ROUTES = new Set(["#/perfil", "#/dashboard"]);
+
+// ── Protección de rutas ───────────────────────────────────────────────────────
+
+/**
+ * Verifica sesión activa contra el backend.
+ * Si no hay sesión, redirige a #/login y retorna false.
+ *
+ * @returns {boolean} true si hay sesión válida
+ */
+async function requireAuth() {
+  // 1. Intentar con el estado local primero (evita round-trip innecesario)
+  if (estado.estaAutenticado()) return true;
+
+  // 2. Si no, consultar el backend (cookies pueden estar activas tras recarga)
+  try {
+    const res = await auth.me();
+    if (res.ok && res.usuario) {
+      estado.setUsuario(res.usuario);
+      return true;
+    }
+  } catch {
+    // 401 del backend o error de red
+  }
+
+  // 3. Sin sesión → redirigir
+  window.location.hash = "#/login";
+  return false;
+}
+
+// ── Router ────────────────────────────────────────────────────────────────────
 
 function getRoute() {
   const hash = window.location.hash || "#/";
-  // Soporta rutas con parámetro: #/vacantes/5
   if (hash.startsWith("#/vacantes/")) return "#/vacantes/:id";
   return hash;
 }
@@ -68,11 +96,16 @@ async function renderPage() {
   const app = document.getElementById("app");
   const route = getRoute();
 
-  // Navbar siempre presente
+  // Bloquear rutas privadas
+  if (PRIVATE_ROUTES.has(route)) {
+    const ok = await requireAuth();
+    if (!ok) return; // requireAuth ya redirigió
+  }
+
+  // Navbar (síncrono, usa estado local)
   const navHtml = renderNavbar(estado.usuario);
 
   let pageHtml = "";
-
   if (route === "#/vacantes/:id") {
     const id = window.location.hash.split("/")[2];
     pageHtml = await renderVacanteDetalle(id);
@@ -83,7 +116,13 @@ async function renderPage() {
 
   app.innerHTML = navHtml + pageHtml;
 
-  // Delegar eventos del router a links con data-route
+  // Listener de logout en navbar
+  attachNavbarListeners(() => {
+    estado.setUsuario(null);
+    window.location.hash = "#/login";
+  });
+
+  // Delegación de clicks en links con data-route
   app.querySelectorAll("[data-route]").forEach((el) => {
     el.addEventListener("click", (e) => {
       e.preventDefault();
@@ -92,24 +131,23 @@ async function renderPage() {
   });
 }
 
-// ── Inicialización ──────────────────────────────────────────────────────────
+// ── Inicialización ────────────────────────────────────────────────────────────
 
 async function init() {
-  // Verificar sesión activa en el backend al cargar la página
+  // Sincronizar sesión con el backend al cargar
   if (!estado.estaAutenticado()) {
     try {
       const res = await auth.me();
-      estado.setUsuario(res.usuario);
+      if (res.ok && res.usuario) {
+        estado.setUsuario(res.usuario);
+      }
     } catch {
-      // No hay sesión activa — normal para visitantes
+      // Sin sesión activa — normal para visitantes
     }
   }
 
   await renderPage();
 }
 
-// Navegar cuando cambia el hash
 window.addEventListener("hashchange", renderPage);
-
-// Arrancar
 init();

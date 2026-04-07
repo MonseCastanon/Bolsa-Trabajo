@@ -17,8 +17,15 @@ import { renderLogin }       from "./pages/Login.js";
 import { renderRegister }    from "./pages/Register.js";
 import { renderVacantes }    from "./pages/Vacantes.js";
 import { renderVacanteDetalle } from "./pages/VacanteDetalle.js";
-import { renderDashboard }   from "./pages/Dashboard.js";
-import { auth }              from "./services/api.js";
+import { renderDashboard } from "./pages/Dashboard.js";
+import { auth } from "./services/api.js";
+import { renderEmpresas } from "./pages/Empresas.js";
+import { renderEmpresaDetalle } from "./pages/EmpresaDetalle.js";
+import { renderPerfilEmpresa } from "./pages/PerfilEmpresa.js";
+import { renderAdminPanel } from "./pages/admin/Panel.js";
+import { renderAdminUsuarios } from "./pages/admin/Usuarios.js";
+import { renderAdminVacantes } from "./pages/admin/Vacantes.js";
+import { renderAdminPostulaciones } from "./pages/admin/Postulaciones.js";
 
 // ── Estado global ─────────────────────────────────────────────────────────────
 // sessionStorage sobrevive recarga pero no cierre de pestaña.
@@ -43,6 +50,22 @@ export const estado = {
 // ── Rutas ─────────────────────────────────────────────────────────────────────
 
 const ROUTES = {
+  "#/":              renderHome,
+  "#/login":         renderLogin,
+  "#/registro":      renderRegister,
+  "#/vacantes":      renderVacantes,
+  "#/dashboard":     renderDashboard,
+  // Gilberto agrega sus rutas aquí en semana 2:
+  // "#/vacantes/nueva": renderNuevaVacante,
+  // Juan Diego agrega las suyas:
+  "#/admin/panel": renderAdminPanel,
+  "#/admin/usuarios": renderAdminUsuarios,
+  "#/admin/vacantes": renderAdminVacantes,
+  "#/admin/postulaciones": renderAdminPostulaciones,
+  "#/empresas":      renderEmpresas,
+  "#/empresas/:id":  renderEmpresaDetalle,
+  "#/perfil-empresa": renderPerfilEmpresa,
+};
   "#/":          renderHome,
   "#/login":     renderLogin,
   "#/registro":  renderRegister,
@@ -88,7 +111,9 @@ async function requireAuth() {
 
 function getRoute() {
   const hash = window.location.hash || "#/";
+  // Soporta rutas con parámetro: #/vacantes/5, #/empresas/5
   if (hash.startsWith("#/vacantes/")) return "#/vacantes/:id";
+  if (hash.startsWith("#/empresas/")) return "#/empresas/:id";
   return hash;
 }
 
@@ -131,7 +156,22 @@ async function renderPage() {
   });
 }
 
-// ── Inicialización ────────────────────────────────────────────────────────────
+// Evento de cierre de sesión
+  const btnLogout = document.getElementById("btn-logout");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", async () => {
+      try {
+        await auth.logout();
+      } catch (e) {
+        console.error(e);
+      }
+      estado.setUsuario(null);
+      window.location.hash = "#/";
+    });
+  }
+}
+
+// ── Inicialización ──────────────────────────────────────────────────────────
 
 async function init() {
   // Sincronizar sesión con el backend al cargar

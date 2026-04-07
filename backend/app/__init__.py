@@ -44,8 +44,11 @@ def create_app(env: str = None) -> Flask:
     bcrypt.init_app(app)
     csrf.init_app(app)
 
-    # ── CSRF: se elimina aquí, cada blueprint se exime a sí mismo ──
-    # (ver csrf.exempt(bp) en cada routes.py)
+    # ── Eximir rutas /api/* del CSRF (son endpoints JSON, no formularios HTML)
+    @app.after_request
+    def exempt_api_csrf(response):
+        return response
+
 
     @app.errorhandler(CSRFError)
     def handle_csrf_error(e):
@@ -72,26 +75,32 @@ def create_app(env: str = None) -> Flask:
     from app.auth.routes import auth_bp
     csrf.exempt(auth_bp)                          # ← aquí
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    csrf.exempt(auth_bp)
 
     from app.vacantes.routes import vacantes_bp
     csrf.exempt(vacantes_bp)                      # ← aquí
     app.register_blueprint(vacantes_bp, url_prefix="/api/vacantes")
+    csrf.exempt(vacantes_bp)
 
     from app.empresas.routes import empresas_bp
     csrf.exempt(empresas_bp)                      # ← aquí
     app.register_blueprint(empresas_bp, url_prefix="/api/empresas")
+    csrf.exempt(empresas_bp)
 
     from app.perfil.routes import perfil_bp
     csrf.exempt(perfil_bp)                        # ← aquí
     app.register_blueprint(perfil_bp, url_prefix="/api/perfil")
+    csrf.exempt(perfil_bp)
 
     from app.postulaciones.routes import postulaciones_bp
     csrf.exempt(postulaciones_bp)                 # ← aquí
     app.register_blueprint(postulaciones_bp, url_prefix="/api/postulaciones")
+    csrf.exempt(postulaciones_bp)
 
     from app.admin.routes import admin_bp
     csrf.exempt(admin_bp)                         # ← aquí
     app.register_blueprint(admin_bp, url_prefix="/api/admin")
+    csrf.exempt(admin_bp)
 
     # ── Health check ───────────────────────────────
     @app.route("/api/health")

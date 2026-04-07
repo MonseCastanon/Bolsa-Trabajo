@@ -45,7 +45,19 @@ def obtener_perfil():
         })
 
     elif current_user.rol == "empresa":
-        return jsonify({"ok": False, "mensaje": "No implementado"}), 403
+        e = Empresa.query.filter_by(usuario_id=current_user.id).first()
+        if not e:
+            return jsonify({"ok": False, "mensaje": "Perfil no encontrado."}), 404
+        return jsonify({
+            "ok": True,
+            "tipo": "empresa",
+            "perfil": {
+                "nombre": e.nombre,
+                "sector": e.sector,
+                "descripcion": e.descripcion,
+                "sitio_web": e.sitio_web,
+            },
+        })
 
     return jsonify({"ok": False, "mensaje": "Rol inválido"}), 400
 
@@ -91,20 +103,6 @@ def editar_perfil_estudiante():
             "cv_url": perfil.cv_url,
         },
     })
-        e = Empresa.query.filter_by(usuario_id=current_user.id).first()
-        if not e:
-            return jsonify({"ok": False, "mensaje": "Perfil no encontrado."}), 404
-        return jsonify({
-            "ok": True,
-            "perfil": {
-                "nombre": e.nombre,
-                "sector": e.sector,
-                "descripcion": e.descripcion,
-                "sitio_web": e.sitio_web,
-            },
-        })
-
-    return jsonify({"ok": False, "mensaje": "Rol sin perfil."}), 400
 
 
 # TODO (semana 3):

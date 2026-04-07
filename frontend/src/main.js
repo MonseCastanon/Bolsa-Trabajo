@@ -55,6 +55,7 @@ const ROUTES = {
   "#/registro":      renderRegister,
   "#/vacantes":      renderVacantes,
   "#/dashboard":     renderDashboard,
+  "#/perfil":    PerfilPage,
   // Gilberto agrega sus rutas aquí en semana 2:
   // "#/vacantes/nueva": renderNuevaVacante,
   // Juan Diego agrega las suyas:
@@ -66,15 +67,8 @@ const ROUTES = {
   "#/empresas/:id":  renderEmpresaDetalle,
   "#/perfil-empresa": renderPerfilEmpresa,
 };
-  "#/":          renderHome,
-  "#/login":     renderLogin,
-  "#/registro":  renderRegister,
-  "#/vacantes":  renderVacantes,
-  "#/dashboard": renderDashboard,
-  "#/perfil":    PerfilPage,
   // Gilberto agrega sus rutas aquí en semana 2
   // Juan Diego agrega las suyas en semana 3
-};
 
 // Rutas que requieren sesión activa
 const PRIVATE_ROUTES = new Set(["#/perfil", "#/dashboard"]);
@@ -169,7 +163,6 @@ async function renderPage() {
       window.location.hash = "#/";
     });
   }
-}
 
 // ── Inicialización ──────────────────────────────────────────────────────────
 

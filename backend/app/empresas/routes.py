@@ -16,6 +16,7 @@ from app.utils import roles_required
 from flask_login import current_user
 from app import db
 from app.empresas.forms import PerfilEmpresaForm
+from app.utils import roles_required
 
 empresas_bp = Blueprint("empresas", __name__)
 

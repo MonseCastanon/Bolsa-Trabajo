@@ -12,7 +12,7 @@
 export function renderVacanteCard(vacante, nombreEmpresa = "") {
   const badgeClase = vacante.tipo === "empleo" ? "badge-empleo" : "badge-practica";
   const badgeLabel = vacante.tipo === "empleo" ? "Empleo" : "Prácticas";
-  const modalidadIcons = { presencial: "🏢", remoto: "🌐", hibrido: "🔀" };
+  const modalidadIcons = { presencial: "🏢", remoto: "🏠", hibrido: "🔀" };
   const iconModalidad = modalidadIcons[vacante.modalidad] || "";
 
   return `

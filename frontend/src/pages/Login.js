@@ -26,7 +26,7 @@ export function renderLogin() {
 
         estado.setUsuario(res.usuario);
         flash("Sesión iniciada correctamente", "success");
-        window.location.hash = "#/";
+        window.location.hash = "#/dashboard";
       } catch (err) {
         flash(err.message, "error");
         btn.disabled = false;

@@ -18,6 +18,13 @@ import { renderVacantes } from "./pages/Vacantes.js";
 import { renderVacanteDetalle } from "./pages/VacanteDetalle.js";
 import { renderDashboard } from "./pages/Dashboard.js";
 import { auth } from "./services/api.js";
+import { renderEmpresas } from "./pages/Empresas.js";
+import { renderEmpresaDetalle } from "./pages/EmpresaDetalle.js";
+import { renderPerfilEmpresa } from "./pages/PerfilEmpresa.js";
+import { renderAdminPanel } from "./pages/admin/Panel.js";
+import { renderAdminUsuarios } from "./pages/admin/Usuarios.js";
+import { renderAdminVacantes } from "./pages/admin/Vacantes.js";
+import { renderAdminPostulaciones } from "./pages/admin/Postulaciones.js";
 
 // ── Estado global mínimo ────────────────────────────────────────────────────
 // Se guarda en sessionStorage para sobrevivir recargas en la misma sesión.
@@ -52,7 +59,10 @@ const ROUTES = {
   // Gilberto agrega sus rutas aquí en semana 2:
   // "#/vacantes/nueva": renderNuevaVacante,
   // Juan Diego agrega las suyas:
-  // "#/admin":       renderAdmin,
+  "#/admin/panel": renderAdminPanel,
+  "#/admin/usuarios": renderAdminUsuarios,
+  "#/admin/vacantes": renderAdminVacantes,
+  "#/admin/postulaciones": renderAdminPostulaciones,
 };
 
 // ── Router ──────────────────────────────────────────────────────────────────
@@ -90,6 +100,20 @@ async function renderPage() {
       window.location.hash = el.dataset.route;
     });
   });
+
+  // Evento de cierre de sesión
+  const btnLogout = document.getElementById("btn-logout");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", async () => {
+      try {
+        await auth.logout();
+      } catch (e) {
+        console.error(e);
+      }
+      estado.setUsuario(null);
+      window.location.hash = "#/";
+    });
+  }
 }
 
 // ── Inicialización ──────────────────────────────────────────────────────────

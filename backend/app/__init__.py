@@ -15,7 +15,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
-from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFProtect, CSRFError
 
 from config import config_map
 
@@ -52,6 +52,16 @@ def create_app(env: str = None) -> Flask:
     bcrypt.init_app(app)
     csrf.init_app(app)
 
+    # ── Eximir rutas /api/* del CSRF (son endpoints JSON, no formularios HTML)
+    @app.after_request
+    def exempt_api_csrf(response):
+        return response
+
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        return jsonify({"ok": False, "mensaje": "Token CSRF inválido o ausente."}), 400
+
     # ── Configuración de Flask-Login ───────────────
     login_manager.login_view = "auth.login"
     login_manager.login_message = "Inicia sesión para continuar."
@@ -72,26 +82,32 @@ def create_app(env: str = None) -> Flask:
     # Auth — Monserrat (semana 2)
     from app.auth.routes import auth_bp
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    csrf.exempt(auth_bp)
 
     # Vacantes — Gilberto (semana 2)
     from app.vacantes.routes import vacantes_bp
     app.register_blueprint(vacantes_bp, url_prefix="/api/vacantes")
+    csrf.exempt(vacantes_bp)
 
     # Empresas — Juan Diego (semana 2)
     from app.empresas.routes import empresas_bp
     app.register_blueprint(empresas_bp, url_prefix="/api/empresas")
+    csrf.exempt(empresas_bp)
 
     # Perfil — Monserrat/Gilberto (semana 3)
     from app.perfil.routes import perfil_bp
     app.register_blueprint(perfil_bp, url_prefix="/api/perfil")
+    csrf.exempt(perfil_bp)
 
     # Postulaciones — Gilberto (semana 3)
     from app.postulaciones.routes import postulaciones_bp
     app.register_blueprint(postulaciones_bp, url_prefix="/api/postulaciones")
+    csrf.exempt(postulaciones_bp)
 
     # Admin — Juan Diego (semana 3)
     from app.admin.routes import admin_bp
     app.register_blueprint(admin_bp, url_prefix="/api/admin")
+    csrf.exempt(admin_bp)
 
     # ── Health check ───────────────────────────────
     @app.route("/api/health")

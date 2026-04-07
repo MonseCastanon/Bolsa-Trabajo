@@ -20,6 +20,9 @@ export async function renderAdminUsuarios() {
     // Renderizar una tabla con usuarios
     let html = `
     <main class="max-w-4xl mx-auto px-6 py-10">
+        <a href="#/dashboard" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 mb-4 transition">
+            &larr; Volver al Dashboard
+        </a>
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Usuarios</h2>
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
             <table class="w-full text-left border-collapse">
@@ -69,5 +72,5 @@ export async function renderAdminUsuarios() {
         }
     }
 
-    return html // Es crucial retornar el HTML para que main.js lo inyecte
+    return html 
 }

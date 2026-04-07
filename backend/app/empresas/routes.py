@@ -12,6 +12,10 @@ Endpoints planificados:
 
 from flask import Blueprint, jsonify
 from app.models import Empresa
+from app.utils import roles_required
+from flask_login import current_user
+from app import db
+from app.empresas.forms import PerfilEmpresaForm
 
 empresas_bp = Blueprint("empresas", __name__)
 
@@ -57,7 +61,7 @@ def detalle(empresa_id):
 @empresas_bp.route("/mi-perfil", methods=["GET"])
 def mi_perfil():
     """Perfil para obtener los datos de la empresa actual"""
-    empresa = Empresa.query.get_or_404(current_user.empresa_id)
+    empresa = Empresa.query.filter_by(usuario_id=current_user.id).first_or_404()
     return jsonify({
         "ok": True,
         "empresa": {
@@ -74,7 +78,7 @@ def mi_perfil():
 @roles_required("empresa")
 def editar_mi_perfil():
     """Editar perfil de empresa propia"""
-    empresa = Empresa.query.get_or_404(current_user.empresa_id)
+    empresa = Empresa.query.filter_by(usuario_id=current_user.id).first_or_404()
     form = PerfilEmpresaForm()
     if form.validate_on_submit():
         empresa.nombre = form.nombre.data

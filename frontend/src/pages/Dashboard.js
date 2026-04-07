@@ -95,12 +95,21 @@ async function renderDashboardEstudiante(email) {
 function renderDashboardEmpresa(email) {
   return `
     <main class="max-w-3xl mx-auto px-6 py-10">
-      <h1 class="text-2xl font-bold text-gray-900 mb-1">Panel Empresa</h1>
+      <h1 class="text-2xl font-bold text-gray-900 mb-1">Panel de Empresa</h1>
       <p class="text-sm text-gray-500 mb-8">${email}</p>
 
-      <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
-        <p class="text-blue-700 font-medium">Panel de empresa disponible en semana 2</p>
-        <p class="text-sm text-blue-500 mt-1">Gilberto implementará la gestión de vacantes aquí.</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a href="#/perfil-empresa"
+          class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition text-center cursor-pointer">
+          <div class="text-3xl mb-2">🏢</div>
+          <p class="font-semibold text-gray-800">Mi Perfil Público</p>
+          <p class="text-xs text-gray-400 mt-1">Editar logo, misión y sitio web</p>
+        </a>
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 transition text-center opacity-70">
+          <div class="text-3xl mb-2">📄</div>
+          <p class="font-semibold text-gray-800">Publicar Vacantes</p>
+          <p class="text-xs text-gray-400 mt-1">Próximamente (Semana 2 - Gilberto)</p>
+        </div>
       </div>
     </main>
     ${renderFooter()}

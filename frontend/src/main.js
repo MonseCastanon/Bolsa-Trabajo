@@ -63,14 +63,18 @@ const ROUTES = {
   "#/admin/usuarios": renderAdminUsuarios,
   "#/admin/vacantes": renderAdminVacantes,
   "#/admin/postulaciones": renderAdminPostulaciones,
+  "#/empresas":      renderEmpresas,
+  "#/empresas/:id":  renderEmpresaDetalle,
+  "#/perfil-empresa": renderPerfilEmpresa,
 };
 
 // ── Router ──────────────────────────────────────────────────────────────────
 
 function getRoute() {
   const hash = window.location.hash || "#/";
-  // Soporta rutas con parámetro: #/vacantes/5
+  // Soporta rutas con parámetro: #/vacantes/5, #/empresas/5
   if (hash.startsWith("#/vacantes/")) return "#/vacantes/:id";
+  if (hash.startsWith("#/empresas/")) return "#/empresas/:id";
   return hash;
 }
 

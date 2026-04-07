@@ -13,6 +13,7 @@ Endpoints planificados:
 from flask import Blueprint, jsonify
 from flask_login import login_required, current_user
 from app.models import PerfilEstudiante, Empresa
+from app.empresas.forms import PerfilEmpresaForm
 
 perfil_bp = Blueprint("perfil", __name__)
 
@@ -57,3 +58,21 @@ def ver_perfil():
 # TODO (semana 3):
 #   - PUT /estudiante con PerfilEstudianteForm
 #   - PUT /empresa con PerfilEmpresaForm
+# Implementar el endpoint /api/perfil/empresa conectandolo con la logica del formulario correspondiente
+
+@perfil_bp.route("/empresa", methods=["PUT"])
+@login_required
+def editar_perfil_empresa():
+    """Editar perfil de empresa propia"""
+    empresa = Empresa.query.filter_by(usuario_id=current_user.id).first_or_404()
+    form = PerfilEmpresaForm()
+    if form.validate_on_submit():
+        empresa.nombre = form.nombre.data
+        empresa.sector = form.sector.data
+        empresa.descripcion = form.descripcion.data
+        empresa.sitio_web = form.sitio_web.data
+        empresa.logo_url = form.logo_url.data
+        db.session.commit()
+        return jsonify({"ok": True, "mensaje": "Perfil actualizado correctamente"})
+    return jsonify({"ok": False, "errores": form.errors}), 400
+

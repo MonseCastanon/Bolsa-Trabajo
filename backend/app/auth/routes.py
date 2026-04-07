@@ -75,9 +75,8 @@ def login():
     """
     data = request.get_json()
 
-    form = LoginForm(data=data, meta={"csrf": False})
-    if not form.validate():
-        return jsonify({"ok": False, "errores": form.errors}), 400
+    if not data or not data.get("email") or not data.get("password"):
+        return jsonify({"ok": False, "mensaje": "Email y contraseña son requeridos."}), 400
 
     usuario = Usuario.query.filter_by(email=data["email"]).first()
 

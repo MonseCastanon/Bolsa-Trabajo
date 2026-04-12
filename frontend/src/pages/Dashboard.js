@@ -99,12 +99,6 @@ function renderDashboardEmpresa(email) {
       <p class="text-sm text-gray-500 mb-8">${email}</p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <a href="#/perfil-empresa"
-          class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition text-center cursor-pointer">
-          <div class="text-3xl mb-2">🏢</div>
-          <p class="font-semibold text-gray-800">Mi Perfil Público</p>
-          <p class="text-xs text-gray-400 mt-1">Editar logo, misión y sitio web</p>
-        </a>
         <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 transition text-center opacity-70">
           <div class="text-3xl mb-2">📄</div>
           <p class="font-semibold text-gray-800">Publicar Vacantes</p>

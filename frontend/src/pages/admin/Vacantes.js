@@ -53,14 +53,16 @@ export async function renderAdminVacantes() {
     </main>
     `
 
-    if (!window.toggleVacante) {
-        window.toggleVacante = async function(id) {
-            try {
-                await admin.toggleVacante(id)
-                window.location.reload()
-            } catch (e) {
-                alert("Error al cambiar estado de la vacante")
+    // Siempre reasignamos para evitar closures obsoletos
+    window.toggleVacante = async function(id) {
+        try {
+            await admin.toggleVacante(id)
+            const app = document.getElementById("app")
+            if (app) {
+                app.innerHTML = await renderAdminVacantes()
             }
+        } catch (e) {
+            alert("Error al cambiar estado de la vacante")
         }
     }
 

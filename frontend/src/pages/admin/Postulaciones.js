@@ -55,14 +55,16 @@ export async function renderAdminPostulaciones() {
     </main>
     `
 
-    if (!window.togglePostulacion) {
-        window.togglePostulacion = async function(id) {
-            try {
-                await admin.togglePostulacion(id)
-                window.location.reload()
-            } catch (e) {
-                alert("Error al cambiar estado")
+    // Siempre reasignamos para evitar closures obsoletos
+    window.togglePostulacion = async function(id) {
+        try {
+            await admin.togglePostulacion(id)
+            const app = document.getElementById("app")
+            if (app) {
+                app.innerHTML = await renderAdminPostulaciones()
             }
+        } catch (e) {
+            alert("Error al cambiar estado")
         }
     }
 

@@ -14,22 +14,18 @@ export async function PerfilPage() {
   try {
     data = await perfilApi.ver();
   } catch (err) {
-    // 401 → el router ya debería haber redirigido, pero por si acaso:
     return `
-      <main class="page-container">
-        <div class="card card--error">
-          <p>${err.message}</p>
-          <a href="#/login" class="btn btn--primary" style="display:inline-block;margin-top:1rem;">
-            Iniciar sesión
-          </a>
-        </div>
+      <main class="p-10 text-center text-red-500">
+        <p>${err.message}</p>
+        <a href="#/login" class="text-blue-600 underline mt-4 inline-block">
+          Iniciar sesión
+        </a>
       </main>
     `;
   }
 
   const p = data.perfil;
 
-  // Listeners se adjuntan después de que el DOM se renderiza
   setTimeout(() => {
     const form = document.getElementById("perfil-form");
     if (!form) return;
@@ -51,7 +47,6 @@ export async function PerfilPage() {
         bio: form.bio.value.trim(),
       };
 
-      // Eliminar claves null para no fallar validación de semestre
       Object.keys(body).forEach((k) => body[k] === null && delete body[k]);
 
       try {
@@ -67,187 +62,103 @@ export async function PerfilPage() {
   }, 0);
 
   return `
-    <main class="page-container">
-      <div class="card perfil-card">
+    <main class="max-w-3xl mx-auto px-6 py-10">
+      
+      <h1 class="text-2xl font-bold text-gray-900 mb-6">
+        Mi perfil
+      </h1>
 
-        <div class="perfil-header">
-          <div class="perfil-avatar">${(p.nombre || "?")[0].toUpperCase()}</div>
+      <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+
+        <!-- HEADER -->
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-bold">
+            ${(p.nombre || "?")[0].toUpperCase()}
+          </div>
           <div>
-            <h1 class="perfil-nombre">${p.nombre || ""} ${p.apellido || ""}</h1>
-            <p class="perfil-email">${p.email || ""}</p>
+            <p class="font-semibold text-gray-900">
+              ${p.nombre || ""} ${p.apellido || ""}
+            </p>
+            <p class="text-sm text-gray-500">
+              ${p.email || ""}
+            </p>
           </div>
         </div>
 
-        <hr class="divider" />
+        <form id="perfil-form">
 
-        <form id="perfil-form" novalidate>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Nombre *</label>
+          <!-- INFORMACIÓN GENERAL -->
+          <p class="text-xs font-semibold text-gray-400 uppercase mb-2">
+            Información general
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm text-gray-600 mb-1">Nombre *</label>
               <input type="text" name="nombre" required
                 value="${escapeHtml(p.nombre || "")}"
-                placeholder="Tu nombre"
-                class="form-input" />
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none" />
             </div>
-            <div class="form-group">
-              <label class="form-label">Apellido *</label>
+
+            <div>
+              <label class="block text-sm text-gray-600 mb-1">Apellido *</label>
               <input type="text" name="apellido" required
                 value="${escapeHtml(p.apellido || "")}"
-                placeholder="Tu apellido"
-                class="form-input" />
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none" />
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Carrera</label>
+          <!-- ACADÉMICO -->
+          <p class="text-xs font-semibold text-gray-400 uppercase mb-2">
+            Información académica
+          </p>
+
+          <div class="mb-4">
+            <label class="block text-sm text-gray-600 mb-1">Carrera</label>
             <input type="text" name="carrera"
               value="${escapeHtml(p.carrera || "")}"
-              placeholder="Ej. Ingeniería en Sistemas"
-              class="form-input" />
+              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none" />
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Semestre actual</label>
+          <div class="mb-4">
+            <label class="block text-sm text-gray-600 mb-1">Semestre</label>
             <input type="number" name="semestre" min="1" max="12"
               value="${p.semestre || ""}"
-              placeholder="1 – 12"
-              class="form-input" style="max-width:120px;" />
+              class="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none w-32" />
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Link a mi CV</label>
+          <!-- PERFIL PROFESIONAL -->
+          <p class="text-xs font-semibold text-gray-400 uppercase mb-2">
+            Perfil profesional
+          </p>
+
+          <div class="mb-4">
+            <label class="block text-sm text-gray-600 mb-1">CV</label>
             <input type="url" name="cv_url"
               value="${escapeHtml(p.cv_url || "")}"
-              placeholder="https://drive.google.com/..."
-              class="form-input" />
+              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none" />
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Acerca de mí</label>
+          <div class="mb-6">
+            <label class="block text-sm text-gray-600 mb-1">Acerca de mí</label>
             <textarea name="bio" rows="4"
-              placeholder="Cuéntanos un poco sobre ti..."
-              class="form-input form-textarea">${escapeHtml(p.bio || "")}</textarea>
+              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none">${escapeHtml(p.bio || "")}</textarea>
           </div>
 
-          <div class="form-actions">
-            <button type="submit" class="btn btn--primary btn--block">
+          <!-- ACTION -->
+          <div class="pt-4 border-t border-gray-100">
+            <button type="submit"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition">
               Guardar cambios
             </button>
           </div>
-        </form>
 
+        </form>
       </div>
     </main>
-
-    <style>
-      .perfil-header {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1.25rem;
-      }
-      .perfil-avatar {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #3b82f6, #6366f1);
-        color: #fff;
-        font-size: 1.6rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-      }
-      .perfil-nombre {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 0;
-      }
-      .perfil-email {
-        font-size: 0.85rem;
-        color: #64748b;
-        margin: 0;
-      }
-      .divider {
-        border: none;
-        border-top: 1px solid #e2e8f0;
-        margin: 1rem 0 1.5rem;
-      }
-        .page-container {
-        padding: 2rem 1rem;
-        margin-top: 2rem;
-      }
-
-      .perfil-card {
-        max-width: 560px;
-        margin: 0 auto;
-        padding: 1.5rem;
-      }
-
-      .form-actions {
-        margin-top: 1.5rem;
-        display: flex;
-        justify-content: center;
-      }
-
-      .btn--block {
-        width: 100%;
-        max-width: 280px;
-        padding: 0.7rem 1rem;
-        font-size: 0.95rem;
-      }
-      .btn--primary {
-        background-color: #2563eb;
-        color: #fff;
-        border: none;
-        border-radius: 0.5rem;
-        cursor: pointer;
-        transition: background-color 0.15s ease;
-      }
-      .btn--primary:hover {
-        background-color: #1d4ed8;
-      }
-      .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-      }
-      @media (max-width: 480px) {
-        .form-row { grid-template-columns: 1fr; }
-      }
-      .form-group { margin-bottom: 1rem; }
-      .form-label {
-        display: block;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #475569;
-        margin-bottom: 0.35rem;
-      }
-      .form-input {
-        width: 100%;
-        border: 1px solid #cbd5e1;
-        border-radius: 0.5rem;
-        padding: 0.55rem 0.75rem;
-        font-size: 0.9rem;
-        color: #1e293b;
-        background: #f8fafc;
-        box-sizing: border-box;
-        transition: border-color 0.15s, box-shadow 0.15s;
-      }
-      .form-input:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-        background: #fff;
-      }
-      .form-textarea { resize: vertical; }
-    </style>
   `;
 }
 
-// ── Helper ────────────────────────────────────────────────────────────────────
 function escapeHtml(str) {
   return String(str)
     .replace(/&/g, "&amp;")

@@ -41,12 +41,14 @@ export async function PerfilPage() {
       btn.textContent = "Guardando...";
 
       const body = {
-        nombre:   form.nombre.value.trim(),
+        nombre: form.nombre.value.trim(),
         apellido: form.apellido.value.trim(),
-        carrera:  form.carrera.value.trim(),
-        semestre: form.semestre.value ? parseInt(form.semestre.value, 10) : null,
-        cv_url:   form.cv_url.value.trim(),
-        bio:      form.bio.value.trim(),
+        carrera: form.carrera.value.trim(),
+        semestre: form.semestre.value
+          ? parseInt(form.semestre.value, 10)
+          : null,
+        cv_url: form.cv_url.value.trim(),
+        bio: form.bio.value.trim(),
       };
 
       // Eliminar claves null para no fallar validación de semestre
@@ -66,7 +68,7 @@ export async function PerfilPage() {
 
   return `
     <main class="page-container">
-      <div class="card" style="max-width:560px;margin:0 auto;">
+      <div class="card perfil-card">
 
         <div class="perfil-header">
           <div class="perfil-avatar">${(p.nombre || "?")[0].toUpperCase()}</div>
@@ -127,8 +129,8 @@ export async function PerfilPage() {
               class="form-input form-textarea">${escapeHtml(p.bio || "")}</textarea>
           </div>
 
-          <div style="text-align:right;margin-top:1.25rem;">
-            <button type="submit" class="btn btn--primary">
+          <div class="form-actions">
+            <button type="submit" class="btn btn--primary btn--block">
               Guardar cambios
             </button>
           </div>
@@ -173,6 +175,40 @@ export async function PerfilPage() {
         border-top: 1px solid #e2e8f0;
         margin: 1rem 0 1.5rem;
       }
+        .page-container {
+        padding: 2rem 1rem;
+        margin-top: 2rem;
+      }
+
+      .perfil-card {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 1.5rem;
+      }
+
+      .form-actions {
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: center;
+      }
+
+      .btn--block {
+        width: 100%;
+        max-width: 280px;
+        padding: 0.7rem 1rem;
+        font-size: 0.95rem;
+      }
+      .btn--primary {
+        background-color: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+      }
+      .btn--primary:hover {
+        background-color: #1d4ed8;
+      }
       .form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -188,8 +224,6 @@ export async function PerfilPage() {
         font-weight: 600;
         color: #475569;
         margin-bottom: 0.35rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
       }
       .form-input {
         width: 100%;

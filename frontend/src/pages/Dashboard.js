@@ -99,7 +99,7 @@ function renderDashboardEmpresa(email) {
       <p class="text-sm text-gray-500 mb-8">${email}</p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <a href="#/perfil-empresa"
+        <a href="#/perfil-empresa" data-route="#/perfil-empresa"
           class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition text-center cursor-pointer">
           <div class="text-3xl mb-2">🏢</div>
           <p class="font-semibold text-gray-800">Mi Perfil Público</p>

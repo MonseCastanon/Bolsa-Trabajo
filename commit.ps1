@@ -9,4 +9,8 @@ git commit -m "feat: Implementar endpoints y servicios para Empresas y Admin"
 git add frontend/src/pages/admin/ frontend/src/pages/Empresas.js frontend/src/pages/EmpresaDetalle.js frontend/src/pages/PerfilEmpresa.js frontend/src/main.js frontend/src/pages/Login.js backend/app/admin/routes.py
 git commit -m "feat: Páginas frontend de administrador y corrección de bugs en backend/admin"
 
+#Tercer commit 4/7/2026
+git add .
+git commit -m "feat: Implementar endpoints y servicios para Empresas y Admin y corrección de bugs en backend/admin y frontend"
+
 

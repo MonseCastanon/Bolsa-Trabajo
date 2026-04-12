@@ -28,4 +28,8 @@ class PerfilEmpresaForm(FlaskForm):
         "Sitio web",
         validators=[Optional(), URL(message="Ingresa una URL válida.")],
     )
+    logo_url = StringField(
+        "Logo de la empresa",
+        validators=[Optional(), URL(message="Ingresa una URL válida.")],
+    )
     submit = SubmitField("Guardar perfil")

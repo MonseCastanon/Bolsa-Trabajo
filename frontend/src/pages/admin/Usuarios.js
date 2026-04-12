@@ -29,7 +29,6 @@ export async function renderAdminUsuarios() {
                 <thead class="bg-gray-50 text-xs text-gray-500 uppercase border-b border-gray-200">
                     <tr>
                         <th class="px-4 py-3">ID</th>
-                        <th class="px-4 py-3">Nombre</th>
                         <th class="px-4 py-3">Email</th>
                         <th class="px-4 py-3">Rol</th>
                         <th class="px-4 py-3">Estado</th>
@@ -40,7 +39,6 @@ export async function renderAdminUsuarios() {
                     ${usuarios.map(usuario => `
                         <tr class="hover:bg-gray-50 transition">
                             <td class="px-4 py-3 text-sm">${usuario.id}</td>
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">${usuario.nombre || '-'}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">${usuario.email}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">${usuario.rol}</td>
                             <td class="px-4 py-3 text-sm font-medium ${usuario.activo ? 'text-green-600' : 'text-red-600'}">
@@ -51,24 +49,24 @@ export async function renderAdminUsuarios() {
                             </td>
                         </tr>
                     `).join('')}
-                    ${usuarios.length === 0 ? '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No hay usuarios.</td></tr>' : ''}
+                    ${usuarios.length === 0 ? '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No hay usuarios.</td></tr>' : ''}
                 </tbody>
             </table>
         </div>
     </main>
     `
 
-    // Agregar el evento onclick al boton toggleUsuario si no existe
-    if (!window.toggleUsuario) {
-        window.toggleUsuario = async function(id) {
-            try {
-                await admin.toggleUsuario(id)
-                // Forzar recarga de la vista
-                const app = document.getElementById("app")
-                window.location.reload()
-            } catch (e) {
-                alert("Error al cambiar estado")
+    // Siempre reasignamos toggleUsuario para que use el renderAdminUsuarios actualizado
+    window.toggleUsuario = async function(id) {
+        try {
+            await admin.toggleUsuario(id)
+            // Re-renderizar solo el componente dentro del #app (sin recargar la página)
+            const app = document.getElementById("app")
+            if (app) {
+                app.innerHTML = await renderAdminUsuarios()
             }
+        } catch (e) {
+            alert("Error al cambiar estado")
         }
     }
 

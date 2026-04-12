@@ -16,7 +16,6 @@ from app.utils import roles_required
 from flask_login import current_user
 from app import db
 from app.empresas.forms import PerfilEmpresaForm
-from app.utils import roles_required
 
 empresas_bp = Blueprint("empresas", __name__)
 
@@ -59,6 +58,7 @@ def detalle(empresa_id):
 
 # TODO (Juan Diego, semana 2):
 #   - PUT /mi-perfil con @roles_required("empresa")
+@roles_required("empresa")
 @empresas_bp.route("/mi-perfil", methods=["GET"])
 def mi_perfil():
     """Perfil para obtener los datos de la empresa actual"""

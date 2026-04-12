@@ -21,7 +21,7 @@ export function renderNavbar(usuario) {
       <a href="#/candidatos" class="nav-link">Candidatos</a>
     `,
     admin: `
-      <a href="#/admin" class="nav-link">Panel Admin</a>
+      <a href="#/admin/panel" class="nav-link">Panel Admin</a>
       <a href="#/vacantes" class="nav-link">Vacantes</a>
     `,
   };

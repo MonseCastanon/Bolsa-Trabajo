@@ -22,26 +22,50 @@ def register():
     if not form.validate():
         return jsonify({"ok": False, "errores": form.errors}), 400
 
+    rol = data["rol"]
+
+    # Validaciones extra según rol
+    if rol == "estudiante":
+        if not data.get("nombre", "").strip() or not data.get("apellido", "").strip():
+            return jsonify({"ok": False, "mensaje": "Nombre y apellido son obligatorios."}), 400
+    elif rol == "empresa":
+        if not data.get("nombre_empresa", "").strip():
+            return jsonify({"ok": False, "mensaje": "El nombre comercial es obligatorio."}), 400
+
     hashed = bcrypt.generate_password_hash(data["password"]).decode("utf-8")
     nuevo_usuario = Usuario(
         email=data["email"],
         password_hash=hashed,
-        rol=data["rol"],
+        rol=rol,
     )
     db.session.add(nuevo_usuario)
     db.session.flush()
 
-    if data["rol"] == "estudiante":
+    if rol == "estudiante":
+        semestre_val = data.get("semestre")
+        if semestre_val is not None:
+            try:
+                semestre_val = int(semestre_val)
+            except (ValueError, TypeError):
+                semestre_val = None
+
         perfil = PerfilEstudiante(
             usuario_id=nuevo_usuario.id,
-            nombre="",
-            apellido="",
+            nombre=data.get("nombre", "").strip(),
+            apellido=data.get("apellido", "").strip(),
+            carrera=data.get("carrera", "").strip() or None,
+            semestre=semestre_val,
+            cv_url=data.get("cv_url", "").strip() or None,
+            bio=data.get("bio", "").strip() or None,
         )
         db.session.add(perfil)
-    elif data["rol"] == "empresa":
+    elif rol == "empresa":
         empresa = Empresa(
             usuario_id=nuevo_usuario.id,
-            nombre="Mi Empresa",
+            nombre=data.get("nombre_empresa", "").strip(),
+            descripcion=data.get("descripcion", "").strip() or None,
+            sector=data.get("sector", "").strip() or None,
+            sitio_web=data.get("sitio_web", "").strip() or None,
         )
         db.session.add(empresa)
 

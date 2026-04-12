@@ -11,7 +11,7 @@
  */
 
 import { renderNavbar, attachNavbarListeners } from "./components/Navbar.js";
-import { PerfilPage }        from "./pages/Perfil.js";
+import { PerfilPage }        from "./pages/PerfilEstudiante.js";
 import { renderHome }        from "./pages/Home.js";
 import { renderLogin }       from "./pages/Login.js";
 import { renderRegister }    from "./pages/Register.js";

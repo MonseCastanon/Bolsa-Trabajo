@@ -6,7 +6,13 @@ import { auth } from "../services/api.js";
 import { estado } from "../main.js";
 import { flash } from "../components/FlashMessage.js";
 
-export function renderLogin() {
+export async function renderLogin() {
+
+  if (estado.estaAutenticado()) {
+    window.location.hash = "#/dashboard";
+    return '';
+  }
+
   // El evento de submit se enlaza después de que el DOM se inyecta
   setTimeout(() => {
     const form = document.getElementById("form-login");

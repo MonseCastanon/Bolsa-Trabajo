@@ -17,8 +17,8 @@ export async function renderAdminPostulaciones() {
     
     let html = `
     <main class="max-w-5xl mx-auto px-6 py-10">
-        <a href="#/dashboard" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 mb-4 transition">
-            &larr; Volver al Dashboard
+        <a href="#/admin/panel" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 mb-4 transition">
+            &larr; Volver al Panel
         </a>
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Postulaciones</h2>
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">

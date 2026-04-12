@@ -31,14 +31,6 @@ csrf = CSRFProtect()
 
 
 def create_app(env: str = None) -> Flask:
-    """
-    Fábrica de la aplicación Flask.
-
-    Parámetro:
-        env: nombre del entorno ('development' | 'production').
-             Si no se pasa, se lee de la variable FLASK_ENV.
-    """
-
     app = Flask(__name__)
 
     # ── Configuración ──────────────────────────────
@@ -63,12 +55,13 @@ def create_app(env: str = None) -> Flask:
         return jsonify({"ok": False, "mensaje": "Token CSRF inválido o ausente."}), 400
 
     # ── Configuración de Flask-Login ───────────────
-    login_manager.login_view = "auth.login"
-    login_manager.login_message = "Inicia sesión para continuar."
-    login_manager.login_message_category = "warning"
+    login_manager.login_view = None
 
-    # ── CORS manual (sin flask-cors extra) ─────────
-    # Permite al frontend en Vite (:5173) consumir la API en desarrollo.
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        return jsonify({"ok": False, "mensaje": "Sesión requerida."}), 401
+
+    # ── CORS manual ────────────────────────────────
     @app.after_request
     def add_cors_headers(response):
         frontend_url = app.config.get("FRONTEND_URL", "http://localhost:5173")
@@ -79,33 +72,33 @@ def create_app(env: str = None) -> Flask:
         return response
 
     # ── Registro de Blueprints ─────────────────────
-    # Auth — Monserrat (semana 2)
     from app.auth.routes import auth_bp
+    csrf.exempt(auth_bp)                          # ← aquí
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     csrf.exempt(auth_bp)
 
-    # Vacantes — Gilberto (semana 2)
     from app.vacantes.routes import vacantes_bp
+    csrf.exempt(vacantes_bp)                      # ← aquí
     app.register_blueprint(vacantes_bp, url_prefix="/api/vacantes")
     csrf.exempt(vacantes_bp)
 
-    # Empresas — Juan Diego (semana 2)
     from app.empresas.routes import empresas_bp
+    csrf.exempt(empresas_bp)                      # ← aquí
     app.register_blueprint(empresas_bp, url_prefix="/api/empresas")
     csrf.exempt(empresas_bp)
 
-    # Perfil — Monserrat/Gilberto (semana 3)
     from app.perfil.routes import perfil_bp
+    csrf.exempt(perfil_bp)                        # ← aquí
     app.register_blueprint(perfil_bp, url_prefix="/api/perfil")
     csrf.exempt(perfil_bp)
 
-    # Postulaciones — Gilberto (semana 3)
     from app.postulaciones.routes import postulaciones_bp
+    csrf.exempt(postulaciones_bp)                 # ← aquí
     app.register_blueprint(postulaciones_bp, url_prefix="/api/postulaciones")
     csrf.exempt(postulaciones_bp)
 
-    # Admin — Juan Diego (semana 3)
     from app.admin.routes import admin_bp
+    csrf.exempt(admin_bp)                         # ← aquí
     app.register_blueprint(admin_bp, url_prefix="/api/admin")
     csrf.exempt(admin_bp)
 

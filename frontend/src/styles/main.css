@@ -44,3 +44,10 @@ button {
 .estado-revisado   { color: #2563eb; }
 .estado-aceptado   { color: #16a34a; }
 .estado-rechazado  { color: #dc2626; }
+
+/* ── Ocultar ojo nativo del navegador (Edge / Chrome) ─────────── */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+}

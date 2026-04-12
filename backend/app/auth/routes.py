@@ -1,14 +1,5 @@
 """
 app/auth/routes.py — Blueprint de autenticación.
-
-Endpoints:
-  POST /api/auth/register  → crear cuenta (estudiante | empresa)
-  POST /api/auth/login     → iniciar sesión, devuelve JSON
-  POST /api/auth/logout    → cerrar sesión
-  GET  /api/auth/me        → datos del usuario actual (requiere sesión)
-
-Monserrat implementa esto en la semana 2.
-El frontend (Vite + JS) consume estos endpoints vía fetch().
 """
 
 from flask import Blueprint, request, jsonify
@@ -20,59 +11,70 @@ from app.auth.forms import LoginForm, RegisterForm
 from app.utils import roles_required
 
 auth_bp = Blueprint("auth", __name__)
+# ← Sin csrf.exempt aquí, se hace en __init__.py
 
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
-    """
-    Registro de nuevo usuario.
-    Espera JSON: { email, password, confirmar_password, rol }
-    Crea el perfil vacío correspondiente al rol.
-    """
     data = request.get_json()
-
-    # Reutilizamos el form para validación aunque sea una API JSON
     form = RegisterForm(data=data, meta={"csrf": False})
 
     if not form.validate():
         return jsonify({"ok": False, "errores": form.errors}), 400
 
+    rol = data["rol"]
+
+    # Validaciones extra según rol
+    if rol == "estudiante":
+        if not data.get("nombre", "").strip() or not data.get("apellido", "").strip():
+            return jsonify({"ok": False, "mensaje": "Nombre y apellido son obligatorios."}), 400
+    elif rol == "empresa":
+        if not data.get("nombre_empresa", "").strip():
+            return jsonify({"ok": False, "mensaje": "El nombre comercial es obligatorio."}), 400
+
     hashed = bcrypt.generate_password_hash(data["password"]).decode("utf-8")
     nuevo_usuario = Usuario(
         email=data["email"],
         password_hash=hashed,
-        rol=data["rol"],
+        rol=rol,
     )
     db.session.add(nuevo_usuario)
-    db.session.flush()  # obtenemos el id antes de commit
+    db.session.flush()
 
-    # Crear perfil vacío según el rol
-    if data["rol"] == "estudiante":
+    if rol == "estudiante":
+        semestre_val = data.get("semestre")
+        if semestre_val is not None:
+            try:
+                semestre_val = int(semestre_val)
+            except (ValueError, TypeError):
+                semestre_val = None
+
         perfil = PerfilEstudiante(
             usuario_id=nuevo_usuario.id,
-            nombre="",
-            apellido="",
+            nombre=data.get("nombre", "").strip(),
+            apellido=data.get("apellido", "").strip(),
+            carrera=data.get("carrera", "").strip() or None,
+            semestre=semestre_val,
+            cv_url=data.get("cv_url", "").strip() or None,
+            bio=data.get("bio", "").strip() or None,
         )
         db.session.add(perfil)
-    elif data["rol"] == "empresa":
+    elif rol == "empresa":
         empresa = Empresa(
             usuario_id=nuevo_usuario.id,
-            nombre="Mi Empresa",
+            nombre=data.get("nombre_empresa", "").strip(),
+            descripcion=data.get("descripcion", "").strip() or None,
+            sector=data.get("sector", "").strip() or None,
+            sitio_web=data.get("sitio_web", "").strip() or None,
         )
         db.session.add(empresa)
 
     db.session.commit()
-
     return jsonify({"ok": True, "mensaje": "Cuenta creada exitosamente."}), 201
 
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
-    """
-    Inicio de sesión.
-    Espera JSON: { email, password }
-    Devuelve datos básicos del usuario para que el frontend los almacene.
-    """
     data = request.get_json()
 
     if not data or not data.get("email") or not data.get("password"):
@@ -87,7 +89,6 @@ def login():
         return jsonify({"ok": False, "mensaje": "Tu cuenta está desactivada."}), 403
 
     login_user(usuario)
-
     return jsonify({
         "ok": True,
         "usuario": {
@@ -99,9 +100,9 @@ def login():
 
 
 @auth_bp.route("/logout", methods=["POST"])
-@login_required
 def logout():
-    """Cierra la sesión del usuario actual."""
+    if not current_user.is_authenticated:
+        return jsonify({"ok": False, "mensaje": "No hay sesión activa."}), 401
     logout_user()
     return jsonify({"ok": True, "mensaje": "Sesión cerrada."})
 
@@ -109,7 +110,6 @@ def logout():
 @auth_bp.route("/me", methods=["GET"])
 @login_required
 def me():
-    """Devuelve los datos del usuario en sesión."""
     return jsonify({
         "ok": True,
         "usuario": {

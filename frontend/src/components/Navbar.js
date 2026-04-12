@@ -31,6 +31,7 @@ function getLinks(usuario) {
         <a href="#/vacantes"     class="nav-link">Vacantes</a>
         <a href="#/mis-vacantes" class="nav-link">Mis vacantes</a>
         <a href="#/candidatos"   class="nav-link">Candidatos</a>
+        <a href="#/perfil-empresa"  class="nav-link">Perfil</a>
       `;
     case "admin":
       return `

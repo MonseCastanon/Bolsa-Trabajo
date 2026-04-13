@@ -4,9 +4,10 @@
  * Gilberto completa el botón "Postularse" en semana 3.
  */
 
-import { vacantes, empresas } from "../services/api.js";
+import { vacantes, empresas, postulaciones } from "../services/api.js";
 import { estado } from "../main.js";
 import { renderFooter } from "../components/Footer.js";
+import { flash } from "../components/FlashMessage.js";
 
 export async function renderVacanteDetalle(id) {
   let vacante = null;
@@ -47,7 +48,68 @@ export async function renderVacanteDetalle(id) {
            Inicia sesión para postularte
          </a>`;
 
-  // TODO (Gilberto, semana 3): conectar btn-postular al endpoint de postulaciones
+    let accionesEmpresa = "";
+
+   if (
+     estado.estaAutenticado() &&
+     estado.usuario.rol === "empresa"
+    ) {
+    accionesEmpresa = `
+      <div class="flex gap-3 mt-4">
+        <button id="btn-editar"
+         class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-sm">
+          Editar
+        </button>
+
+        <button id="btn-eliminar"
+          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm">
+          Cerrar vacante
+        </button>
+      </div>
+   `;
+}
+
+   setTimeout(() => {
+   const btn = document.getElementById("btn-postular");
+
+   const btnEliminar = document.getElementById("btn-eliminar");
+   if (btnEliminar) {
+     btnEliminar.addEventListener("click", async () => {
+       const confirmar = confirm("¿Seguro que quieres cerrar esta vacante?");
+       if (!confirmar) return;
+
+       try {
+         await vacantes.eliminar(id);
+         flash("Vacante cerrada correctamente", "success");
+         window.location.hash = "#/vacantes";
+        } catch (e) {
+          flash(e.message, "error");
+        }
+      });
+   }
+
+    // ── BOTÓN EDITAR ──
+    const btnEditar = document.getElementById("btn-editar");
+    if (btnEditar) {
+      btnEditar.addEventListener("click", () => {
+      window.location.hash = `#/vacantes/${id}/editar`;
+    });
+   }
+
+   if (!btn) return;
+ 
+   btn.addEventListener("click", async () => {
+     try {
+       await postulaciones.postularse(id, {
+         mensaje: "Estoy interesado en la vacante"
+       });
+ 
+       flash("Postulación enviada correctamente", "success");
+     } catch (e) {
+       flash(e.message, "error");
+     }
+   });
+ }, 0);
 
   return `
     <main class="max-w-2xl mx-auto px-6 py-10">
@@ -82,7 +144,10 @@ export async function renderVacanteDetalle(id) {
           </section>
         ` : ""}
 
-        <div>${botonPostular}</div>
+        <div>
+         ${botonPostular}
+         ${accionesEmpresa}
+        </div>
       </div>
     </main>
     ${renderFooter()}

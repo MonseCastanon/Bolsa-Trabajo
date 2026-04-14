@@ -71,80 +71,75 @@ function marcarValido(field) {
 
 function camposEstudiante() {
   return `
-    <div class="grid grid-cols-2 gap-3 mb-4">
-      <div>
-        <label class="${LABEL_CLASS}">Nombre <span class="text-red-500">*</span></label>
-        <input type="text" name="nombre" placeholder="Ej. Juan"
-          class="w-full border ${BORDER_DEFAULT} rounded-lg px-3 py-2 text-sm transition-colors duration-200" />
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+      <div class="form-group">
+        <label class="form-label">Nombre <span class="req">*</span></label>
+        <input type="text" name="nombre" placeholder="Ej. Juan" class="form-input" autocomplete="given-name" />
       </div>
-      <div>
-        <label class="${LABEL_CLASS}">Apellido <span class="text-red-500">*</span></label>
-        <input type="text" name="apellido" placeholder="Ej. Pérez"
-          class="w-full border ${BORDER_DEFAULT} rounded-lg px-3 py-2 text-sm transition-colors duration-200" />
+      <div class="form-group">
+        <label class="form-label">Apellido <span class="req">*</span></label>
+        <input type="text" name="apellido" placeholder="Ej. Pérez" class="form-input" autocomplete="family-name" />
       </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-3 mb-4">
-      <div>
-        <label class="${LABEL_CLASS}">Carrera</label>
-        <input type="text" name="carrera" placeholder="Ej. Ing. en Sistemas"
-          class="w-full border ${BORDER_DEFAULT} rounded-lg px-3 py-2 text-sm transition-colors duration-200" />
+    <div style="display:grid;grid-template-columns:1fr auto;gap:.75rem;align-items:end;">
+      <div class="form-group">
+        <label class="form-label">Carrera</label>
+        <input type="text" name="carrera" placeholder="Ej. Ing. en Sistemas" class="form-input" />
       </div>
-      <div>
-        <label class="${LABEL_CLASS}">Semestre</label>
-        <select name="semestre"
-          class="w-full border ${BORDER_DEFAULT} rounded-lg px-3 py-2 text-sm bg-white transition-colors duration-200">
-          <option value="">Seleccionar</option>
-          ${[1,2,3,4,5,6,7,8,9,10,11,12].map(s => `<option value="${s}">${s}°</option>`).join("")}
-        </select>
+      <div class="form-group">
+        <label class="form-label">Semestre</label>
+        <div style="position:relative;">
+          <select name="semestre" class="form-select" style="width:90px;">
+            <option value="">—</option>
+            ${[1,2,3,4,5,6,7,8,9,10,11,12].map(s => `<option value="${s}">${s}°</option>`).join("")}
+          </select>
+        </div>
       </div>
     </div>
 
-    <div class="mb-4">
-      <label class="${LABEL_CLASS}">Link CV</label>
-      <input type="url" name="cv_url" placeholder="https://mi-cv.com (opcional)"
-        class="w-full border ${BORDER_DEFAULT} rounded-lg px-3 py-2 text-sm transition-colors duration-200" />
+    <div class="form-group">
+      <label class="form-label">URL del CV</label>
+      <input type="url" name="cv_url" placeholder="https://mi-cv.com (opcional)" class="form-input" />
     </div>
 
-    <div class="mb-4">
-      <label class="${LABEL_CLASS}">Acerca de ti</label>
-      <textarea name="bio" rows="3" placeholder="Cuéntanos sobre ti (opcional)"
-        class="w-full border ${BORDER_DEFAULT} rounded-lg px-3 py-2 text-sm resize-none transition-colors duration-200"></textarea>
+    <div class="form-group">
+      <label class="form-label">Acerca de ti</label>
+      <textarea name="bio" rows="3" placeholder="Cuéntanos sobre ti (opcional)" class="form-textarea"></textarea>
     </div>
   `;
 }
 
 function camposEmpresa() {
   return `
-    <div class="mb-4">
-      <label class="${LABEL_CLASS}">Nombre de empresa <span class="text-red-500">*</span></label>
-      <input type="text" name="nombre_empresa" placeholder="Ej. Tech Solutions SA"
-        class="w-full border ${BORDER_DEFAULT} rounded-lg px-3 py-2 text-sm transition-colors duration-200" />
+    <div class="form-group">
+      <label class="form-label">Nombre de empresa <span class="req">*</span></label>
+      <input type="text" name="nombre_empresa" placeholder="Ej. Tech Solutions SA" class="form-input" autocomplete="organization" />
     </div>
 
-    <div class="mb-4">
-      <label class="${LABEL_CLASS}">Sector</label>
-      <select name="sector"
-        class="w-full border ${BORDER_DEFAULT} rounded-lg px-3 py-2 text-sm bg-white transition-colors duration-200">
-        <option value="">Seleccionar sector</option>
-        <option value="Tecnología">Tecnología</option>
-        <option value="Salud">Salud</option>
-        <option value="Educación">Educación</option>
-        <option value="Finanzas">Finanzas</option>
-        <option value="Otro">Otro</option>
-      </select>
+    <div class="form-group">
+      <label class="form-label">Sector</label>
+      <div style="position:relative;">
+        <select name="sector" class="form-select">
+          <option value="">Seleccionar sector</option>
+          <option value="Tecnología">Tecnología</option>
+          <option value="Salud">Salud</option>
+          <option value="Educación">Educación</option>
+          <option value="Finanzas">Finanzas</option>
+          <option value="Manufactura">Manufactura</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
     </div>
 
-    <div class="mb-4">
-      <label class="${LABEL_CLASS}">Descripción</label>
-      <textarea name="descripcion" rows="3" placeholder="Describe tu empresa (opcional)"
-        class="w-full border ${BORDER_DEFAULT} rounded-lg px-3 py-2 text-sm resize-none transition-colors duration-200"></textarea>
+    <div class="form-group">
+      <label class="form-label">Descripción</label>
+      <textarea name="descripcion" rows="3" placeholder="Describe tu empresa (opcional)" class="form-textarea"></textarea>
     </div>
 
-    <div class="mb-4">
-      <label class="${LABEL_CLASS}">Sitio web</label>
-      <input type="url" name="sitio_web" placeholder="https://tu-empresa.com (opcional)"
-        class="w-full border ${BORDER_DEFAULT} rounded-lg px-3 py-2 text-sm transition-colors duration-200" />
+    <div class="form-group">
+      <label class="form-label">Sitio web</label>
+      <input type="url" name="sitio_web" placeholder="https://tu-empresa.com" class="form-input" />
     </div>
   `;
 }
@@ -183,10 +178,10 @@ function setupPasswordValidation(form) {
       { ok: /[0-9]/.test(val),         label: "Al menos un número" },
     ];
 
-    reqContainer.innerHTML = checks
+  reqContainer.innerHTML = checks
       .map(c => `
-        <div class="flex items-center gap-1 ${c.ok ? "text-green-600" : "text-red-500"}">
-          <span>${c.ok ? "✓" : "✗"}</span>
+        <div style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:${c.ok ? '#166534' : '#991b1b'};">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">${c.ok ? '<polyline points="20 6 9 17 4 12"/>' : '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}</svg>
           <span>${c.label}</span>
         </div>
       `)
@@ -391,6 +386,17 @@ export function renderRegister() {
     setupFieldValidation(form);
     setupDynamicFieldValidation(form, "estudiante");
 
+    // Resaltar opción de rol activa
+    function actualizarRolVisual() {
+      document.querySelectorAll(".rol-option").forEach((el) => {
+        const val = el.dataset.val;
+        const checked = form.querySelector(`[name="rol"][value="${val}"]`).checked;
+        el.style.borderColor = checked ? "var(--primary)" : "var(--border-mid)";
+        el.style.background  = checked ? "var(--primary-light)" : "";
+      });
+    }
+    actualizarRolVisual();
+
     // Cambio dinámico
     radios.forEach((radio) => {
       radio.addEventListener("change", () => {
@@ -398,6 +404,7 @@ export function renderRegister() {
         camposDinamicos.innerHTML =
           rol === "empresa" ? camposEmpresa() : camposEstudiante();
 
+        actualizarRolVisual();
         // Re-registrar validaciones para campos dinámicos
         setupDynamicFieldValidation(form, rol);
       });
@@ -443,66 +450,76 @@ export function renderRegister() {
   }, 0);
 
   return `
-    <main class="flex items-center justify-center min-h-[80vh] px-4 py-10 bg-gray-50">
-      <div class="w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-sm p-8">
+    <main style="min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:2rem 1rem;background:var(--bg);">
+      <div style="width:100%;max-width:460px;">
 
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">Crear cuenta</h1>
-        <p class="text-sm text-gray-500 mb-6">Elige tu tipo de cuenta</p>
+        <div style="text-align:center;margin-bottom:1.75rem;">
+          <h1 style="font-size:1.5rem;margin-bottom:.3rem;">Crear cuenta</h1>
+          <p style="color:var(--muted);font-size:.9rem;">Únete a la plataforma institucional</p>
+        </div>
 
-        <form id="form-registro" novalidate>
+        <div class="card card-body" style="border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.08);">
+          <form id="form-registro" novalidate>
 
-          <div class="mb-5 grid grid-cols-2 gap-2">
-            <label class="cursor-pointer">
-              <input type="radio" name="rol" value="estudiante" class="sr-only peer" checked />
-              <div class="border-2 rounded-lg p-3 text-center text-sm peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-colors duration-200">
-                🎓 Estudiante
-              </div>
-            </label>
-            <label class="cursor-pointer">
-              <input type="radio" name="rol" value="empresa" class="sr-only peer" />
-              <div class="border-2 rounded-lg p-3 text-center text-sm peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-colors duration-200">
-                🏢 Empresa
-              </div>
-            </label>
-          </div>
-
-          <div id="campos-dinamicos"></div>
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico <span class="text-red-500">*</span></label>
-            <input type="email" name="email" placeholder="ejemplo@correo.com"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm transition-colors duration-200" />
-          </div>
-
-          <div class="mb-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña <span class="text-red-500">*</span></label>
-            <div class="password-wrapper relative">
-              <input type="password" name="password" placeholder="Mínimo 8 caracteres"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm transition-colors duration-200"
-                style="-webkit-appearance:none;" />
-              <button type="button" class="toggle-password absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded transition-colors" style="background:transparent;border:none;outline:none;cursor:pointer;" tabindex="-1">
-                ${EYE_OPEN}
-              </button>
+            <p class="form-label" style="margin-bottom:.6rem;">Tipo de cuenta</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem;">
+              <label style="cursor:pointer;">
+                <input type="radio" name="rol" value="estudiante" class="sr-only" checked />
+                <div class="rol-option" data-val="estudiante" style="border:2px solid var(--border-mid);border-radius:8px;padding:.75rem;text-align:center;transition:border-color .15s,background .15s;">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" style="margin:0 auto .4rem;display:block;" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                  <span style="font-size:.825rem;font-weight:600;color:var(--navy-mid);">Estudiante</span>
+                </div>
+              </label>
+              <label style="cursor:pointer;">
+                <input type="radio" name="rol" value="empresa" class="sr-only" />
+                <div class="rol-option" data-val="empresa" style="border:2px solid var(--border-mid);border-radius:8px;padding:.75rem;text-align:center;transition:border-color .15s,background .15s;">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" style="margin:0 auto .4rem;display:block;" aria-hidden="true"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/><path d="M3 21h18M9 21v-4h6v4"/></svg>
+                  <span style="font-size:.825rem;font-weight:600;color:var(--navy-mid);">Empresa</span>
+                </div>
+              </label>
             </div>
-          </div>
 
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar contraseña <span class="text-red-500">*</span></label>
-            <div class="password-wrapper relative">
-              <input type="password" name="confirmar_password" placeholder="Repite tu contraseña"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm transition-colors duration-200"
-                style="-webkit-appearance:none;" />
-              <button type="button" class="toggle-password absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded transition-colors" style="background:transparent;border:none;outline:none;cursor:pointer;" tabindex="-1">
-                ${EYE_OPEN}
-              </button>
+            <div id="campos-dinamicos"></div>
+
+            <div class="form-group">
+              <label for="reg-email" class="form-label">Correo electrónico <span class="req">*</span></label>
+              <input type="email" id="reg-email" name="email" placeholder="tu@correo.edu"
+                class="form-input" autocomplete="email" />
             </div>
-          </div>
 
-          <button type="submit"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-sm transition-all duration-200">
-            Crear cuenta
-          </button>
-        </form>
+            <div class="form-group" style="margin-bottom:.5rem;">
+              <label for="reg-password" class="form-label">Contraseña <span class="req">*</span></label>
+              <div class="password-wrapper input-wrapper">
+                <input type="password" id="reg-password" name="password" placeholder="Mínimo 8 caracteres"
+                  class="form-input" autocomplete="new-password" />
+                <button type="button" class="toggle-password input-toggle-btn" tabindex="-1" aria-label="Mostrar contraseña">
+                  ${EYE_OPEN}
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:1.5rem;">
+              <label for="reg-confirm" class="form-label">Confirmar contraseña <span class="req">*</span></label>
+              <div class="password-wrapper input-wrapper">
+                <input type="password" id="reg-confirm" name="confirmar_password" placeholder="Repite tu contraseña"
+                  class="form-input" autocomplete="new-password" />
+                <button type="button" class="toggle-password input-toggle-btn" tabindex="-1" aria-label="Mostrar contraseña">
+                  ${EYE_OPEN}
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-full">
+              Crear cuenta
+            </button>
+
+          </form>
+        </div>
+
+        <p style="text-align:center;font-size:.88rem;color:var(--muted);margin-top:1.25rem;">
+          ¿Ya tienes cuenta?
+          <a href="#/login" style="color:var(--primary);font-weight:600;"> Iniciar sesión</a>
+        </p>
       </div>
     </main>
   `;

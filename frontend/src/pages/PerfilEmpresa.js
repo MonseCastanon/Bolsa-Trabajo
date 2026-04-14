@@ -1,72 +1,119 @@
-import { empresas } from "../services/api.js";
-import { flash } from "../components/FlashMessage.js";
+/**
+ * src/pages/PerfilEmpresa.js — Edición del perfil de empresa.
+ * Diseño profesional, sin emojis.
+ */
+
+import { empresas }     from "../services/api.js";
+import { flash }        from "../components/FlashMessage.js";
+import { renderFooter } from "../components/Footer.js";
 
 export async function renderPerfilEmpresa() {
-    let empresa = {};
-    try {
-        const res = await empresas.miPerfil();
-        empresa = res.empresa;
-    } catch(e) {
-        return `<main class="p-10 text-center text-red-500">Error al cargar perfil</main>`
-    }
+  let empresa = {};
+  try {
+    const res = await empresas.miPerfil();
+    empresa = res.empresa;
+  } catch (e) {
+    return `
+      <main class="page-container-sm" style="text-align:center;padding-top:4rem;">
+        <p style="color:#dc2626;">Error al cargar el perfil: ${e.message}</p>
+        <a href="#/dashboard" class="btn btn-secondary" style="margin-top:1rem;">Volver al panel</a>
+      </main>`;
+  }
 
-    setTimeout(() => {
-        const form = document.getElementById("perfil-empresa-form");
-        if(form) {
-            form.addEventListener("submit", async(e) => {
-                e.preventDefault();
-                const btn = form.querySelector('button[type="submit"]');
-                btn.disabled = true;
-                btn.textContent = "Guardando...";
-                try {
-                    await empresas.editarPerfil({
-                        nombre: form.nombre.value,
-                        sector: form.sector.value,
-                        descripcion: form.descripcion.value,
-                        sitio_web: form.sitio_web.value,
-                        logo_url: ""
-                    });
-                    flash("Perfil actualizado correctamente", "success");
-                } catch(error) {
-                    flash(error.message, "error");
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = "Guardar";
-                }
-            })
-        }
-    }, 0);
+  setTimeout(() => {
+    const form = document.getElementById("perfil-empresa-form");
+    if (!form) return;
 
-    let html = `
-    <main class="max-w-3xl mx-auto px-6 py-10">
-        <a href="#/dashboard" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 mb-4 transition">
-            &larr; Volver al Dashboard
-        </a>
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Editar mi perfil empresarial</h2>
-        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-            <form id="perfil-empresa-form">
-                <div class="mb-4">
-                    <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre Comercial</label>
-                    <input type="text" id="nombre" name="nombre" value="${empresa.nombre || ''}" class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div class="mb-4">
-                    <label for="sector" class="block text-sm font-medium text-gray-700 mb-1">Sector (e.g. Tecnología, Salud)</label>
-                    <input type="text" id="sector" name="sector" value="${empresa.sector || ''}" class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div class="mb-4">
-                    <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción corporativa</label>
-                    <textarea id="descripcion" name="descripcion" class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 h-24 focus:ring-indigo-500 outline-none">${empresa.descripcion || ''}</textarea>
-                </div>
-                <div class="mb-6">
-                    <label for="sitio_web" class="block text-sm font-medium text-gray-700 mb-1">Sitio web / LinkedIn</label>
-                    <input type="url" id="sitio_web" name="sitio_web" value="${empresa.sitio_web || ''}" class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition">
-                    Guardar cambios
-                </button>
-            </form>
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = "Guardando...";
+
+      try {
+        await empresas.editarPerfil({
+          nombre:      form.nombre.value.trim(),
+          sector:      form.sector.value.trim(),
+          descripcion: form.descripcion.value.trim(),
+          sitio_web:   form.sitio_web.value.trim(),
+          logo_url:    form.logo_url.value.trim(),
+        });
+        flash("Perfil actualizado correctamente.", "success");
+      } catch (error) {
+        flash(error.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Guardar cambios";
+      }
+    });
+  }, 0);
+
+  const initial = (empresa.nombre || "E")[0].toUpperCase();
+
+  return `
+    <main class="page-container-sm">
+      <a href="#/dashboard" class="back-link">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        Volver al panel
+      </a>
+
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2rem;">
+        <div class="avatar avatar-lg avatar-company">${initial}</div>
+        <div>
+          <h1 style="font-size:1.375rem;margin-bottom:.2rem;">Perfil de empresa</h1>
+          <p style="font-size:.875rem;color:var(--muted);">Actualiza la información pública de tu organización</p>
         </div>
+      </div>
+
+      <div class="card card-body" style="border-radius:14px;">
+        <form id="perfil-empresa-form" novalidate>
+
+          <div class="form-group">
+            <label for="emp-nombre" class="form-label">Nombre comercial <span class="req">*</span></label>
+            <input type="text" id="emp-nombre" name="nombre"
+              value="${empresa.nombre || ""}"
+              class="form-input" placeholder="Nombre de la empresa" autocomplete="organization" />
+          </div>
+
+          <div class="form-group">
+            <label for="emp-sector" class="form-label">Sector</label>
+            <input type="text" id="emp-sector" name="sector"
+              value="${empresa.sector || ""}"
+              class="form-input" placeholder="Ej. Tecnología, Salud, Finanzas..." />
+          </div>
+
+          <div class="form-group">
+            <label for="emp-desc" class="form-label">Descripción corporativa</label>
+            <textarea id="emp-desc" name="descripcion" class="form-textarea" rows="4"
+              placeholder="Describe brevemente la misión y actividad de tu empresa...">${empresa.descripcion || ""}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="emp-web" class="form-label">Sitio web</label>
+            <input type="url" id="emp-web" name="sitio_web"
+              value="${empresa.sitio_web || ""}"
+              class="form-input" placeholder="https://www.tuempresa.com" autocomplete="url" />
+          </div>
+
+          <div class="form-group" style="margin-bottom:1.75rem;">
+            <label for="emp-logo" class="form-label">URL del logotipo</label>
+            <input type="url" id="emp-logo" name="logo_url"
+              value="${empresa.logo_url || ""}"
+              class="form-input" placeholder="https://..." />
+            <p class="form-hint">URL pública de la imagen del logo (jpeg, png o svg).</p>
+          </div>
+
+          <div style="display:flex;gap:.75rem;justify-content:flex-end;">
+            <a href="#/dashboard" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Guardar cambios
+            </button>
+          </div>
+
+        </form>
+      </div>
     </main>
-    `
-    return html
+    ${renderFooter()}
+  `;
 }

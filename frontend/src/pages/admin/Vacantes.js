@@ -1,70 +1,112 @@
-import { admin } from "../../services/api.js"
-import { estado } from "../../main.js"
+/**
+ * src/pages/admin/Vacantes.js — Gestión de vacantes del admin.
+ * Diseño profesional, sin emojis, sin alert().
+ */
+
+import { admin }  from "../../services/api.js";
+import { estado } from "../../main.js";
+import { flash }  from "../../components/FlashMessage.js";
 
 export async function renderAdminVacantes() {
-    if (!estado.usuario || estado.usuario.rol !== 'admin'){
-        window.location.hash = '#/login'
-        return ""
-    }
+  if (!estado.usuario || estado.usuario.rol !== "admin") {
+    window.location.hash = "#/login";
+    return "";
+  }
 
-    let vacantes = []
-    try {
-        const res = await admin.listarVacantes()
-        vacantes = res.vacantes || []
-    } catch (e) {
-        console.error(e)
-    }
+  let listaVacantes = [];
+  try {
+    const res = await admin.listarVacantes();
+    listaVacantes = res.vacantes || [];
+  } catch (e) {
+    console.error(e);
+  }
 
-    let html = `
-    <main class="max-w-5xl mx-auto px-6 py-10">
-        <a href="#/admin/panel" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 mb-4 transition">
-            &larr; Volver al Panel
-        </a>
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Vacantes</h2>
-        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-gray-50 text-xs text-gray-500 uppercase border-b border-gray-200">
-                    <tr>
-                        <th class="px-4 py-3">ID</th>
-                        <th class="px-4 py-3">Empresa</th>
-                        <th class="px-4 py-3">Título</th>
-                        <th class="px-4 py-3">Estado</th>
-                        <th class="px-4 py-3 text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    ${vacantes.map(vacante => `
-                        <tr class="hover:bg-gray-50 transition">
-                            <td class="px-4 py-3 text-sm">${vacante.id}</td>
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">${vacante.empresa_id || vacante.empresa || '-'}</td>
-                            <td class="px-4 py-3 text-sm text-gray-800">${vacante.titulo}</td>
-                            <td class="px-4 py-3 text-sm font-medium ${vacante.activo ? 'text-green-600' : 'text-red-600'}">
-                                ${vacante.activo ? 'Activa' : 'Inactiva'}
-                            </td>
-                            <td class="px-4 py-3 text-sm text-center">
-                                <button onclick="window.toggleVacante(${vacante.id})" class="text-indigo-600 hover:text-indigo-900 font-medium bg-indigo-50 px-3 py-1 rounded-md transition hover:bg-indigo-100">Toggle</button>
-                            </td>
-                        </tr>
-                    `).join('')}
-                    ${vacantes.length === 0 ? '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No hay vacantes publicadas.</td></tr>' : ''}
-                </tbody>
-            </table>
+  const rows = listaVacantes.length
+    ? listaVacantes.map((v) => {
+        const estadoKey = v.estado || (v.activo ? "activa" : "cerrada");
+        return `
+          <tr>
+            <td style="color:var(--muted);font-size:.8rem;">#${v.id}</td>
+            <td style="font-size:.825rem;color:var(--slate);">${v.empresa_id || v.empresa || "–"}</td>
+            <td>
+              <a href="#/vacantes/${v.id}" style="color:var(--primary);font-weight:500;font-size:.875rem;text-decoration:none;"
+                 onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">
+                ${v.titulo}
+              </a>
+            </td>
+            <td>
+              <span class="badge ${v.tipo === 'empleo' ? 'badge-empleo' : 'badge-practica'}">${v.tipo === "empleo" ? "Empleo" : "Prácticas"}</span>
+            </td>
+            <td><span class="status status-${estadoKey}">${estadoKey.charAt(0).toUpperCase() + estadoKey.slice(1)}</span></td>
+            <td style="text-align:center;">
+              <button data-vid="${v.id}" data-estado="${estadoKey}"
+                class="btn btn-sm btn-toggle-vacante"
+                style="background:${estadoKey === 'activa' ? '#fee2e2' : '#dcfce7'};color:${estadoKey === 'activa' ? '#991b1b' : '#166534'};border:1.5px solid ${estadoKey === 'activa' ? '#fca5a5' : '#86efac'};"
+                aria-label="${estadoKey === 'activa' ? 'Cerrar' : 'Activar'} vacante ${v.titulo}">
+                ${estadoKey === "activa" ? "Cerrar" : "Activar"}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("")
+    : `<tr><td colspan="6">
+        <div class="empty-state">
+          <h3>Sin vacantes</h3>
+          <p>No hay vacantes registradas en el sistema.</p>
         </div>
+       </td></tr>`;
+
+  const html = `
+    <main class="page-container">
+      <a href="#/admin/panel" class="back-link">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        Volver al panel
+      </a>
+
+      <div class="page-header">
+        <h1>Vacantes</h1>
+        <p>${listaVacantes.length} vacante(s) registrada(s)</p>
+      </div>
+
+      <div class="card" style="overflow:hidden;">
+        <div style="overflow-x:auto;">
+          <table class="data-table" aria-label="Lista de vacantes (admin)">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Empresa</th>
+                <th>Título</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th style="text-align:center;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>
     </main>
-    `
+  `;
 
-    // Siempre reasignamos para evitar closures obsoletos
-    window.toggleVacante = async function(id) {
+  setTimeout(() => {
+    document.querySelectorAll(".btn-toggle-vacante").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const vid = btn.dataset.vid;
+        btn.disabled = true;
+        btn.textContent = "...";
         try {
-            await admin.toggleVacante(id)
-            const app = document.getElementById("app")
-            if (app) {
-                app.innerHTML = await renderAdminVacantes()
-            }
+          await admin.toggleVacante(vid);
+          flash("Estado de la vacante actualizado.", "success");
+          const app = document.getElementById("app");
+          if (app) app.innerHTML = await renderAdminVacantes();
         } catch (e) {
-            alert("Error al cambiar estado de la vacante")
+          flash(e.message || "Error al cambiar el estado.", "error");
+          const app = document.getElementById("app");
+          if (app) app.innerHTML = await renderAdminVacantes();
         }
-    }
+      });
+    });
+  }, 0);
 
-    return html
+  return html;
 }

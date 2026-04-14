@@ -17,6 +17,7 @@ from flask_login import login_required, current_user
 from app import db
 from app.utils import roles_required
 from app.models import Postulacion, Vacante, Empresa
+from sqlalchemy.exc import IntegrityError
 
 postulaciones_bp = Blueprint("postulaciones", __name__)
 
@@ -59,7 +60,8 @@ def postularse(vacante_id):
     try:
         db.session.add(nueva)
         db.session.commit()
-    except:
+    except IntegrityError:
+        db.session.rollback()
         return jsonify({"ok": False, "mensaje": "Ya te postulaste a esta vacante"}), 400
 
     return jsonify({"ok": True, "mensaje": "Postulación enviada"})
@@ -87,6 +89,12 @@ def candidatos(vacante_id):
     vacante = Vacante.query.get_or_404(vacante_id)
 
     empresa = Empresa.query.filter_by(usuario_id=current_user.id).first()
+    if not empresa:
+        return jsonify({"ok": False, "mensaje": "Empresa no encontrada"}), 404
+
+    # Solo la empresa duena de la vacante puede ver sus candidatos
+    if vacante.empresa_id != empresa.id:
+        return jsonify({"ok": False, "mensaje": "No tienes permiso para ver estos candidatos"}), 403
 
     posts = Postulacion.query.filter_by(vacante_id=vacante_id).all()
 
@@ -111,8 +119,14 @@ def candidatos(vacante_id):
 def cambiar_estado(post_id):
     p = Postulacion.query.get_or_404(post_id)
 
-    vacante = Vacante.query.get(p.vacante_id)
     empresa = Empresa.query.filter_by(usuario_id=current_user.id).first()
+    if not empresa:
+        return jsonify({"ok": False, "mensaje": "Empresa no encontrada"}), 404
+
+    vacante = Vacante.query.get(p.vacante_id)
+    # Solo la empresa duena de la vacante puede cambiar el estado
+    if not vacante or vacante.empresa_id != empresa.id:
+        return jsonify({"ok": False, "mensaje": "No tienes permiso para modificar esta postulación"}), 403
 
     data = request.get_json()
     nuevo_estado = data.get("estado")

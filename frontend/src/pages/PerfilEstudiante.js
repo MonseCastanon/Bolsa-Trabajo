@@ -1,13 +1,19 @@
 /**
- * src/pages/Perfil.js — Página de perfil del estudiante.
- *
- * Llama GET /api/perfil/ para cargar datos.
- * Permite editar vía PUT /api/perfil/estudiante.
- * Usa el proxy de Vite (/api → :5000), nunca URL absoluta.
+ * src/pages/PerfilEstudiante.js — Página de perfil del estudiante.
+ * Diseño profesional, sin emojis.
  */
 
 import { perfil as perfilApi } from "../services/api.js";
-import { flash } from "../components/FlashMessage.js";
+import { flash }               from "../components/FlashMessage.js";
+import { renderFooter }        from "../components/Footer.js";
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
 
 export async function PerfilPage() {
   let data;
@@ -15,11 +21,9 @@ export async function PerfilPage() {
     data = await perfilApi.ver();
   } catch (err) {
     return `
-      <main class="p-10 text-center text-red-500">
-        <p>${err.message}</p>
-        <a href="#/login" class="text-blue-600 underline mt-4 inline-block">
-          Iniciar sesión
-        </a>
+      <main class="page-container-sm" style="text-align:center;padding-top:4rem;">
+        <p style="color:#dc2626;margin-bottom:1rem;">${err.message}</p>
+        <a href="#/login" class="btn btn-primary">Iniciar sesión</a>
       </main>
     `;
   }
@@ -37,21 +41,19 @@ export async function PerfilPage() {
       btn.textContent = "Guardando...";
 
       const body = {
-        nombre: form.nombre.value.trim(),
+        nombre:   form.nombre.value.trim(),
         apellido: form.apellido.value.trim(),
-        carrera: form.carrera.value.trim(),
-        semestre: form.semestre.value
-          ? parseInt(form.semestre.value, 10)
-          : null,
-        cv_url: form.cv_url.value.trim(),
-        bio: form.bio.value.trim(),
+        carrera:  form.carrera.value.trim(),
+        semestre: form.semestre.value ? parseInt(form.semestre.value, 10) : null,
+        cv_url:   form.cv_url.value.trim(),
+        bio:      form.bio.value.trim(),
       };
 
       Object.keys(body).forEach((k) => body[k] === null && delete body[k]);
 
       try {
         await perfilApi.editarEstudiante(body);
-        flash("Perfil actualizado correctamente", "success");
+        flash("Perfil actualizado correctamente.", "success");
       } catch (err) {
         flash(err.message || "Error al guardar.", "error");
       } finally {
@@ -61,94 +63,84 @@ export async function PerfilPage() {
     });
   }, 0);
 
+  const initial = (p.nombre || p.email || "U")[0].toUpperCase();
+
   return `
-    <main class="max-w-3xl mx-auto px-6 py-10">
-      
-      <h1 class="text-2xl font-bold text-gray-900 mb-6">
-        Mi perfil
-      </h1>
+    <main class="page-container-sm">
+      <a href="#/dashboard" class="back-link">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        Volver al panel
+      </a>
 
-      <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-
-        <!-- HEADER -->
-        <div class="flex items-center gap-4 mb-6">
-          <div class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-bold">
-            ${(p.nombre || "?")[0].toUpperCase()}
-          </div>
-          <div>
-            <p class="font-semibold text-gray-900">
-              ${p.nombre || ""} ${p.apellido || ""}
-            </p>
-            <p class="text-sm text-gray-500">
-              ${p.email || ""}
-            </p>
-          </div>
+      <!-- Header -->
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2rem;">
+        <div class="avatar avatar-lg">${initial}</div>
+        <div>
+          <h1 style="font-size:1.375rem;margin-bottom:.2rem;">Mi perfil</h1>
+          <p style="font-size:.875rem;color:var(--muted);">${p.email || ""}</p>
         </div>
+      </div>
 
-        <form id="perfil-form">
+      <div class="card card-body" style="border-radius:14px;">
+        <form id="perfil-form" novalidate>
 
-          <!-- INFORMACIÓN GENERAL -->
-          <p class="text-xs font-semibold text-gray-400 uppercase mb-2">
-            Información general
-          </p>
+          <!-- Información general -->
+          <p class="section-label">Información general</p>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="block text-sm text-gray-600 mb-1">Nombre *</label>
-              <input type="text" name="nombre" required
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:.5rem;">
+            <div class="form-group">
+              <label for="p-nombre" class="form-label">Nombre <span class="req">*</span></label>
+              <input type="text" id="p-nombre" name="nombre" required
                 value="${escapeHtml(p.nombre || "")}"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none" />
+                class="form-input" autocomplete="given-name" />
             </div>
-
-            <div>
-              <label class="block text-sm text-gray-600 mb-1">Apellido *</label>
-              <input type="text" name="apellido" required
+            <div class="form-group">
+              <label for="p-apellido" class="form-label">Apellido <span class="req">*</span></label>
+              <input type="text" id="p-apellido" name="apellido" required
                 value="${escapeHtml(p.apellido || "")}"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none" />
+                class="form-input" autocomplete="family-name" />
             </div>
           </div>
 
-          <!-- ACADÉMICO -->
-          <p class="text-xs font-semibold text-gray-400 uppercase mb-2">
-            Información académica
-          </p>
+          <!-- Información académica -->
+          <p class="section-label" style="margin-top:1rem;">Información académica</p>
 
-          <div class="mb-4">
-            <label class="block text-sm text-gray-600 mb-1">Carrera</label>
-            <input type="text" name="carrera"
-              value="${escapeHtml(p.carrera || "")}"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none" />
+          <div style="display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:end;">
+            <div class="form-group">
+              <label for="p-carrera" class="form-label">Carrera</label>
+              <input type="text" id="p-carrera" name="carrera"
+                value="${escapeHtml(p.carrera || "")}"
+                class="form-input" placeholder="Ej. Ingeniería en Sistemas" />
+            </div>
+            <div class="form-group">
+              <label for="p-semestre" class="form-label">Semestre</label>
+              <input type="number" id="p-semestre" name="semestre" min="1" max="12"
+                value="${p.semestre || ""}"
+                class="form-input" style="width:90px;" placeholder="1–12" />
+            </div>
           </div>
 
-          <div class="mb-4">
-            <label class="block text-sm text-gray-600 mb-1">Semestre</label>
-            <input type="number" name="semestre" min="1" max="12"
-              value="${p.semestre || ""}"
-              class="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none w-32" />
-          </div>
+          <!-- Perfil profesional -->
+          <p class="section-label" style="margin-top:1rem;">Perfil profesional</p>
 
-          <!-- PERFIL PROFESIONAL -->
-          <p class="text-xs font-semibold text-gray-400 uppercase mb-2">
-            Perfil profesional
-          </p>
-
-          <div class="mb-4">
-            <label class="block text-sm text-gray-600 mb-1">CV</label>
-            <input type="url" name="cv_url"
+          <div class="form-group">
+            <label for="p-cv" class="form-label">URL del CV</label>
+            <input type="url" id="p-cv" name="cv_url"
               value="${escapeHtml(p.cv_url || "")}"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none" />
+              class="form-input" placeholder="https://drive.google.com/..." />
+            <p class="form-hint">Enlace a Google Drive, PDF público u otro servicio.</p>
           </div>
 
-          <div class="mb-6">
-            <label class="block text-sm text-gray-600 mb-1">Acerca de mí</label>
-            <textarea name="bio" rows="4"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 outline-none">${escapeHtml(p.bio || "")}</textarea>
+          <div class="form-group" style="margin-bottom:1.75rem;">
+            <label for="p-bio" class="form-label">Acerca de mí</label>
+            <textarea id="p-bio" name="bio" rows="4" class="form-textarea"
+              placeholder="Breve descripción de tus habilidades, intereses y objetivos...">${escapeHtml(p.bio || "")}</textarea>
           </div>
 
-          <!-- ACTION -->
-          <div class="pt-4 border-t border-gray-100">
-            <button type="submit"
-              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition">
+          <div style="display:flex;gap:.75rem;justify-content:flex-end;padding-top:.75rem;border-top:1px solid var(--border);">
+            <a href="#/dashboard" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               Guardar cambios
             </button>
           </div>
@@ -156,13 +148,6 @@ export async function PerfilPage() {
         </form>
       </div>
     </main>
+    ${renderFooter()}
   `;
-}
-
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
 }

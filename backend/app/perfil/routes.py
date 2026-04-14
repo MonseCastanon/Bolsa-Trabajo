@@ -14,7 +14,6 @@ from flask_login import login_required, current_user
 
 from app import db
 from app.models import PerfilEstudiante, Empresa
-from app.empresas.forms import PerfilEmpresaForm
 from app.perfil.forms import PerfilEstudianteForm
 from app.utils import roles_required
 
@@ -112,17 +111,21 @@ def editar_perfil_estudiante():
 
 @perfil_bp.route("/empresa", methods=["PUT"])
 @login_required
+@roles_required("empresa")
 def editar_perfil_empresa():
-    """Editar perfil de empresa propia"""
+    """Editar perfil de empresa propia — recibe JSON del frontend"""
     empresa = Empresa.query.filter_by(usuario_id=current_user.id).first_or_404()
-    form = PerfilEmpresaForm()
-    if form.validate_on_submit():
-        empresa.nombre = form.nombre.data
-        empresa.sector = form.sector.data
-        empresa.descripcion = form.descripcion.data
-        empresa.sitio_web = form.sitio_web.data
-        empresa.logo_url = form.logo_url.data
-        db.session.commit()
-        return jsonify({"ok": True, "mensaje": "Perfil actualizado correctamente"})
-    return jsonify({"ok": False, "errores": form.errors}), 400
+    data = request.get_json(silent=True) or {}
 
+    nombre = data.get("nombre", "").strip()
+    if not nombre:
+        return jsonify({"ok": False, "mensaje": "El nombre de la empresa es obligatorio."}), 400
+
+    empresa.nombre = nombre
+    empresa.sector = data.get("sector", empresa.sector or "").strip() or None
+    empresa.descripcion = data.get("descripcion", empresa.descripcion or "").strip() or None
+    empresa.sitio_web = data.get("sitio_web", empresa.sitio_web or "").strip() or None
+    empresa.logo_url = data.get("logo_url", empresa.logo_url or "").strip() or None
+
+    db.session.commit()
+    return jsonify({"ok": True, "mensaje": "Perfil actualizado correctamente"})

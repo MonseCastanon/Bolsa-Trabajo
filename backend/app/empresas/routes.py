@@ -10,7 +10,7 @@ Endpoints planificados:
   PUT  /api/empresas/mi-perfil → editar perfil de empresa propia (solo rol empresa)
 """
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from app.models import Empresa
 from app.utils import roles_required
 from flask_login import current_user
@@ -58,8 +58,8 @@ def detalle(empresa_id):
 
 # TODO (Juan Diego, semana 2):
 #   - PUT /mi-perfil con @roles_required("empresa")
-@roles_required("empresa")
 @empresas_bp.route("/mi-perfil", methods=["GET"])
+@roles_required("empresa")
 def mi_perfil():
     """Perfil para obtener los datos de la empresa actual"""
     empresa = Empresa.query.filter_by(usuario_id=current_user.id).first_or_404()
@@ -78,17 +78,21 @@ def mi_perfil():
 @empresas_bp.route("/mi-perfil", methods=["PUT"])
 @roles_required("empresa")
 def editar_mi_perfil():
-    """Editar perfil de empresa propia"""
+    """Editar perfil de empresa propia — recibe JSON del frontend"""
     empresa = Empresa.query.filter_by(usuario_id=current_user.id).first_or_404()
-    form = PerfilEmpresaForm()
-    if form.validate_on_submit():
-        empresa.nombre = form.nombre.data
-        empresa.sector = form.sector.data
-        empresa.descripcion = form.descripcion.data
-        empresa.sitio_web = form.sitio_web.data
-        empresa.logo_url = form.logo_url.data
-        db.session.commit()
-        return jsonify({"ok": True, "mensaje": "Perfil actualizado correctamente"})
-    return jsonify({"ok": False, "errores": form.errors}), 400
+    data = request.get_json(silent=True) or {}
+
+    nombre = data.get("nombre", "").strip()
+    if not nombre:
+        return jsonify({"ok": False, "mensaje": "El nombre de la empresa es obligatorio."}), 400
+
+    empresa.nombre = nombre
+    empresa.sector = data.get("sector", empresa.sector or "").strip() or None
+    empresa.descripcion = data.get("descripcion", empresa.descripcion or "").strip() or None
+    empresa.sitio_web = data.get("sitio_web", empresa.sitio_web or "").strip() or None
+    empresa.logo_url = data.get("logo_url", empresa.logo_url or "").strip() or None
+
+    db.session.commit()
+    return jsonify({"ok": True, "mensaje": "Perfil actualizado correctamente"})
 
 #   - PerfilEmpresaForm (WTForms)

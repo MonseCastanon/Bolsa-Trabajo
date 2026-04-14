@@ -57,6 +57,9 @@ export const vacantes = {
     return request(`/vacantes/${qs}`);
   },
 
+  misVacantes: () =>
+    request("/vacantes/mis-vacantes"),
+
   detalle: (id) =>
     request(`/vacantes/${id}`),
 

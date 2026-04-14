@@ -55,6 +55,33 @@ def listar():
     })
 
 
+@vacantes_bp.route("/mis-vacantes", methods=["GET"])
+@login_required
+@roles_required("empresa")
+def mis_vacantes():
+    """Retorna todas las vacantes de la empresa autenticada (sin filtro de estado)."""
+    empresa = Empresa.query.filter_by(usuario_id=current_user.id).first()
+    if not empresa:
+        return jsonify({"ok": False, "mensaje": "Empresa no encontrada"}), 404
+
+    vacantes = Vacante.query.filter_by(empresa_id=empresa.id).all()
+    return jsonify({
+        "ok": True,
+        "vacantes": [
+            {
+                "id": v.id,
+                "titulo": v.titulo,
+                "tipo": v.tipo,
+                "modalidad": v.modalidad,
+                "estado": v.estado,
+                "empresa_id": v.empresa_id,
+                "publicada_en": v.publicada_en.isoformat(),
+            }
+            for v in vacantes
+        ],
+    })
+
+
 @vacantes_bp.route("/<int:vacante_id>", methods=["GET"])
 def detalle(vacante_id):
     """Detalle de una vacante específica."""
@@ -111,6 +138,8 @@ def editar_vacante(vacante_id):
     v = Vacante.query.get_or_404(vacante_id)
 
     empresa = Empresa.query.filter_by(usuario_id=current_user.id).first()
+    if not empresa:
+        return jsonify({"ok": False, "mensaje": "Empresa no encontrada"}), 404
 
     if v.empresa_id != empresa.id:
         return jsonify({"ok": False, "mensaje": "No puedes editar esta vacante"}), 403
@@ -138,6 +167,8 @@ def eliminar_vacante(vacante_id):
     v = Vacante.query.get_or_404(vacante_id)
 
     empresa = Empresa.query.filter_by(usuario_id=current_user.id).first()
+    if not empresa:
+        return jsonify({"ok": False, "mensaje": "Empresa no encontrada"}), 404
 
     if v.empresa_id != empresa.id:
         return jsonify({"ok": False, "mensaje": "No puedes eliminar esta vacante"}), 403

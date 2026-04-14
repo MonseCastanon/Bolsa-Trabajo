@@ -73,34 +73,28 @@ def create_app(env: str = None) -> Flask:
 
     # ── Registro de Blueprints ─────────────────────
     from app.auth.routes import auth_bp
-    csrf.exempt(auth_bp)                          # ← aquí
-    app.register_blueprint(auth_bp, url_prefix="/api/auth")
     csrf.exempt(auth_bp)
+    app.register_blueprint(auth_bp, url_prefix="/api/auth")
 
     from app.vacantes.routes import vacantes_bp
-    csrf.exempt(vacantes_bp)                      # ← aquí
-    app.register_blueprint(vacantes_bp, url_prefix="/api/vacantes")
     csrf.exempt(vacantes_bp)
+    app.register_blueprint(vacantes_bp, url_prefix="/api/vacantes")
 
     from app.empresas.routes import empresas_bp
-    csrf.exempt(empresas_bp)                      # ← aquí
-    app.register_blueprint(empresas_bp, url_prefix="/api/empresas")
     csrf.exempt(empresas_bp)
+    app.register_blueprint(empresas_bp, url_prefix="/api/empresas")
 
     from app.perfil.routes import perfil_bp
-    csrf.exempt(perfil_bp)                        # ← aquí
-    app.register_blueprint(perfil_bp, url_prefix="/api/perfil")
     csrf.exempt(perfil_bp)
+    app.register_blueprint(perfil_bp, url_prefix="/api/perfil")
 
     from app.postulaciones.routes import postulaciones_bp
-    csrf.exempt(postulaciones_bp)                 # ← aquí
-    app.register_blueprint(postulaciones_bp, url_prefix="/api/postulaciones")
     csrf.exempt(postulaciones_bp)
+    app.register_blueprint(postulaciones_bp, url_prefix="/api/postulaciones")
 
     from app.admin.routes import admin_bp
-    csrf.exempt(admin_bp)                         # ← aquí
-    app.register_blueprint(admin_bp, url_prefix="/api/admin")
     csrf.exempt(admin_bp)
+    app.register_blueprint(admin_bp, url_prefix="/api/admin")
 
     # ── Health check ───────────────────────────────
     @app.route("/api/health")

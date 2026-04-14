@@ -75,7 +75,17 @@ const ROUTES = {
   // Juan Diego agrega las suyas en semana 3
 
 // Rutas que requieren sesión activa
-const PRIVATE_ROUTES = new Set(["#/perfil", "#/dashboard", "#/vacantes/nueva"]);
+const PRIVATE_ROUTES = new Set([
+  "#/perfil",
+  "#/dashboard",
+  "#/vacantes/nueva",
+  "#/perfil-empresa",
+  "#/candidatos",
+  "#/admin/panel",
+  "#/admin/usuarios",
+  "#/admin/vacantes",
+  "#/admin/postulaciones",
+]);
 
 // ── Protección de rutas ───────────────────────────────────────────────────────
 
@@ -161,19 +171,6 @@ async function renderPage() {
   });
 }
 
-// Evento de cierre de sesión
-  const btnLogout = document.getElementById("btn-logout");
-  if (btnLogout) {
-    btnLogout.addEventListener("click", async () => {
-      try {
-        await auth.logout();
-      } catch (e) {
-        console.error(e);
-      }
-      estado.setUsuario(null);
-      window.location.hash = "#/";
-    });
-  }
 
 // ── Inicialización ──────────────────────────────────────────────────────────
 

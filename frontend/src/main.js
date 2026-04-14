@@ -26,6 +26,9 @@ import { renderAdminPanel } from "./pages/admin/Panel.js";
 import { renderAdminUsuarios } from "./pages/admin/Usuarios.js";
 import { renderAdminVacantes } from "./pages/admin/Vacantes.js";
 import { renderAdminPostulaciones } from "./pages/admin/Postulaciones.js";
+import { renderNuevaVacante } from "./pages/NuevaVacante.js";
+import { renderFormularioVacante } from "./pages/VacanteForm.js";
+import { renderCandidatos } from "./pages/Candidatos.js";
 
 // ── Estado global ─────────────────────────────────────────────────────────────
 // sessionStorage sobrevive recarga pero no cierre de pestaña.
@@ -57,7 +60,8 @@ const ROUTES = {
   "#/dashboard":     renderDashboard,
   "#/perfil":    PerfilPage,
   // Gilberto agrega sus rutas aquí en semana 2:
-  // "#/vacantes/nueva": renderNuevaVacante,
+  "#/vacantes/nueva": renderNuevaVacante,
+  "#/candidatos": renderCandidatos,
   // Juan Diego agrega las suyas:
   "#/admin/panel": renderAdminPanel,
   "#/admin/usuarios": renderAdminUsuarios,
@@ -71,7 +75,7 @@ const ROUTES = {
   // Juan Diego agrega las suyas en semana 3
 
 // Rutas que requieren sesión activa
-const PRIVATE_ROUTES = new Set(["#/perfil", "#/dashboard"]);
+const PRIVATE_ROUTES = new Set(["#/perfil", "#/dashboard", "#/vacantes/nueva"]);
 
 // ── Protección de rutas ───────────────────────────────────────────────────────
 
@@ -106,6 +110,10 @@ async function requireAuth() {
 function getRoute() {
   const hash = window.location.hash || "#/";
   // Soporta rutas con parámetro: #/vacantes/5, #/empresas/5
+  if (hash.startsWith("#/vacantes/") && hash.endsWith("/editar")) {
+  return "#/vacantes/:id/editar";
+  }
+  if (hash === "#/vacantes/nueva") return "#/vacantes/nueva";
   if (hash.startsWith("#/vacantes/")) return "#/vacantes/:id";
   if (hash.startsWith("#/empresas/")) return "#/empresas/:id";
   return hash;
@@ -115,7 +123,7 @@ async function renderPage() {
   const app = document.getElementById("app");
   const route = getRoute();
 
-  // Bloquear rutas privadas
+    // Bloquear rutas privadas
   if (PRIVATE_ROUTES.has(route)) {
     const ok = await requireAuth();
     if (!ok) return; // requireAuth ya redirigió
@@ -128,6 +136,9 @@ async function renderPage() {
   if (route === "#/vacantes/:id") {
     const id = window.location.hash.split("/")[2];
     pageHtml = await renderVacanteDetalle(id);
+  } else if (route === "#/vacantes/:id/editar") {
+    const id = window.location.hash.split("/")[2];
+    pageHtml = await renderFormularioVacante(id);
   } else {
     const renderFn = ROUTES[route] || renderHome;
     pageHtml = await renderFn();

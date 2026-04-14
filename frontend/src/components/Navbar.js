@@ -28,8 +28,7 @@ function getLinks(usuario) {
       `;
     case "empresa":
       return `
-        <a href="#/vacantes"     class="nav-link">Vacantes</a>
-        <a href="#/mis-vacantes" class="nav-link">Mis vacantes</a>
+        <a href="#/vacantes"     class="nav-link">Mis Vacantes</a>
         <a href="#/candidatos"   class="nav-link">Candidatos</a>
         <a href="#/perfil-empresa"  class="nav-link">Perfil</a>
       `;

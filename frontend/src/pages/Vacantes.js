@@ -47,6 +47,9 @@ export async function renderVacantes() {
 
   return `
     <main class="max-w-5xl mx-auto px-6 py-10">
+      <a href="#/dashboard" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 mb-4 transition">
+            &larr; Volver al Dashboard
+      </a>
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 class="text-2xl font-bold text-gray-900">Vacantes disponibles</h1>

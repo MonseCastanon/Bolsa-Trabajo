@@ -99,11 +99,24 @@ function renderDashboardEmpresa(email) {
       <p class="text-sm text-gray-500 mb-8">${email}</p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 transition text-center opacity-70">
-          <div class="text-3xl mb-2">📄</div>
-          <p class="font-semibold text-gray-800">Publicar Vacantes</p>
-          <p class="text-xs text-gray-400 mt-1">Próximamente (Semana 2 - Gilberto)</p>
+
+
+        <!-- Ver vacantes -->
+        <div onclick="window.location.hash='#/vacantes'"
+          class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition text-center cursor-pointer">
+          <div class="text-3xl mb-2">💼</div>
+          <p class="font-semibold text-gray-800">Ver Vacantes</p>
+          <p class="text-xs text-gray-400 mt-1">Consulta tus vacantes publicadas</p>
         </div>
+
+        <!-- Crear vacante -->
+        <div onclick="window.location.hash='#/vacantes/nueva'"
+          class="bg-blue-50 border border-blue-200 rounded-xl p-6 hover:shadow-md transition text-center cursor-pointer">
+          <div class="text-3xl mb-2">➕</div>
+          <p class="font-semibold text-gray-800">Crear Vacante</p>
+          <p class="text-xs text-gray-400 mt-1">Disponible desde backend</p>
+        </div>
+        
       </div>
     </main>
     ${renderFooter()}

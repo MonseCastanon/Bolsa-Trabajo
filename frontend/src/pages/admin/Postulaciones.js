@@ -64,7 +64,7 @@ export async function renderAdminPostulaciones() {
                 app.innerHTML = await renderAdminPostulaciones()
             }
         } catch (e) {
-            alert("Error al cambiar estado")
+            flash(err.message, "error");
         }
     }
 
